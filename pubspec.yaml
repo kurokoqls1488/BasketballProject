@@ -1,0 +1,57 @@
+name: basketball_training
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.4
+  provider: ^6.1.2
+  shared_preferences: ^2.2.2
+  supabase_flutter: ^2.0.0
+  video_player: ^2.8.1
+  chewie: ^1.7.1
+  cached_network_image: ^3.3.1
+  flutter_native_splash: ^2.4.3
+  vibration: ^2.0.0
+  audioplayers: ^5.0.1
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/
+    - icons/
+    - videos/
+    - sounds/
+    - images/brosok.jpg
+    - images/drible.jpg
+    - images/finished.jpg
+    - images/pass.jpg
+    - images/jump.jpg
+    - images/reabilitation.jpg
+    - icons/ball.png
+    - icons/man.png
+    - icons/person.png
+    - images/basketball_ico.png
+    - images/basketball_fon.jpg
+    - images/pustoe_photo.png
+    - sounds/button-click.mp3
+
+flutter_native_splash:
+  color: "#000000"
+  image: images/basketball_ico.png
+  android: true
+  ios: true
+  fullscreen: true

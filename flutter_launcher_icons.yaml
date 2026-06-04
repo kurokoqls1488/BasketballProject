@@ -1,0 +1,8 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "images/basketball_ico.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  background_color: "#ffffff"
+  theme_color: "#2196F3"
