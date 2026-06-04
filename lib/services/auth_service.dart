@@ -264,52 +264,28 @@ class AuthService {
 
   Future<List<dynamic>> fetchComplexes() async {
     debugPrint('=== fetchComplexes START ===');
-    try {
-      debugPrint('Fetching from network...');
-      final response = await supabaseClient
-          .from('complexes')
-          .select()
-          .order('id', ascending: true);
-      final data = response.toList();
-      if (data.isEmpty) {
-        final response2 = await supabaseClient.from('complexes').select();
-        final data2 = response2.toList();
-        if (data2.isNotEmpty) {
-          _complexesCache = data2;
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('cached_complexes', jsonEncode(data2));
-          return data2;
-        }
-      }
-      _complexesCache = data;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('cached_complexes', jsonEncode(data));
-      return data;
-    } catch (e, stack) {
-      debugPrint('ERROR fetchComplexes: $e');
-      debugPrint('Stack trace: $stack');
-      if (_complexesCache != null) return _complexesCache!;
-      return [];
-    }
+    final response = await supabaseClient
+        .from('complexes')
+        .select()
+        .order('id', ascending: true);
+    final data = response.toList();
+    _complexesCache = data;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('cached_complexes', jsonEncode(data));
+    return data;
   }
 
   Future<List<dynamic>> fetchWorkouts(int complexId) async {
     await initCache();
-    if (_workoutsCache.containsKey(complexId)) {
-      return _workoutsCache[complexId]!;
-    }
-    try {
-      final response = await supabaseClient
-          .from('workouts')
-          .select()
-          .eq('id_complex', complexId);
-      final data = response.toList();
-      _workoutsCache[complexId] = data;
-      await _saveWorkoutsCache();
-      return data;
-    } catch (e) {
-      return [];
-    }
+    if (_workoutsCache.containsKey(complexId)) return _workoutsCache[complexId]!;
+    final response = await supabaseClient
+        .from('workouts')
+        .select()
+        .eq('id_complex', complexId);
+    final data = response.toList();
+    _workoutsCache[complexId] = data;
+    await _saveWorkoutsCache();
+    return data;
   }
 
   Future<List<dynamic>> fetchExercises(int workoutId) async {
@@ -317,24 +293,20 @@ class AuthService {
     if (_exercisesCache.containsKey(workoutId)) {
       return _exercisesCache[workoutId]!;
     }
-    try {
-      final workoutExercisesResponse = await supabaseClient
-          .from('workouts_exercises')
-          .select('id_exercise')
-          .eq('id_workout', workoutId);
-      final exerciseLinks = workoutExercisesResponse.toList();
-      if (exerciseLinks.isNotEmpty) {
-        final exerciseIds = exerciseLinks.map((item) => item['id_exercise']).toList();
-        final response = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
-        final data = response.toList();
-        _exercisesCache[workoutId] = data;
-        await _saveExercisesCache();
-        return data;
-      }
-      return [];
-    } catch (e) {
-      return [];
+    final workoutExercisesResponse = await supabaseClient
+        .from('workouts_exercises')
+        .select('id_exercise')
+        .eq('id_workout', workoutId);
+    final exerciseLinks = workoutExercisesResponse.toList();
+    if (exerciseLinks.isNotEmpty) {
+      final exerciseIds = exerciseLinks.map((item) => item['id_exercise']).toList();
+      final response = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
+      final data = response.toList();
+      _exercisesCache[workoutId] = data;
+      await _saveExercisesCache();
+      return data;
     }
+    return [];
   }
 
   String getImageUrl(String imagePath) {
