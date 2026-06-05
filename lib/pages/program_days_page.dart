@@ -48,26 +48,23 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
 
       final days = await _authService.fetchProgramDays(widget.programId);
       final userProgramId = await _authService.getOrCreateUserProgram(widget.programId);
+
+      List<DayWithWorkout> dayList = [];
+      for (final day in days) {
+        final workoutId = day['id_workout'] as int?;
+        dayList.add(DayWithWorkout(
+          programDay: ProgramDay.fromJson(day),
+          workoutId: workoutId,
+          workoutName: _t('Workout'),
+        ));
+      }
+
       Map<int, bool> completionMap = {};
       Map<int, double> progressMap = {};
       if (userProgramId != null) {
         final userProg = await _authService.getUserProgram(userProgramId);
         completionMap = await _authService.fetchDayCompletionStatuses(userProgramId);
         final dayProgress = userProg?['day_progress'] as Map<String, dynamic>? ?? {};
-        for (final day in days) {
-          final dayNum = day['day_number'] as int? ?? 0;
-          if (dayNum > 0) {
-            final dayStats = dayProgress[dayNum.toString()] as Map<String, dynamic>?;
-            progressMap[dayNum] = ((dayStats?['percent'] as num?)?.toDouble() ?? 0.0) / 100.0;
-          }
-        }
-      }
-
-      Map<int, bool> completionMap = {};
-      Map<int, double> progressMap = {};
-      if (userProgram != null) {
-        completionMap = await _authService.fetchDayCompletionStatuses(userProgram);
-        final dayProgress = userProgram['day_progress'] as Map<String, dynamic>? ?? {};
         for (final day in days) {
           final dayNum = day['day_number'] as int? ?? 0;
           if (dayNum > 0) {
