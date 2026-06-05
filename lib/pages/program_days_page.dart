@@ -63,12 +63,12 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
       Map<int, double> progressMap = {};
       if (userProgram != null) {
         completionMap = await _authService.fetchDayCompletionStatuses(userProgram);
-        // Fetch progress for each day
+        final dayProgress = userProgram['day_progress'] as Map<String, dynamic>? ?? {};
         for (final day in days) {
           final dayNum = day['day_number'] as int? ?? 0;
           if (dayNum > 0) {
-            final progress = await _authService.getDayProgressPercent(userProgram, dayNum);
-            progressMap[dayNum] = progress / 100.0;
+            final dayStats = dayProgress[dayNum.toString()] as Map<String, dynamic>?;
+            progressMap[dayNum] = ((dayStats?['percent'] as num?)?.toDouble() ?? 0.0) / 100.0;
           }
         }
       }
