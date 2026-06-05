@@ -275,16 +275,59 @@ class AuthService {
     return data;
   }
 
-  Future<List<dynamic>> fetchWorkouts(int complexId) async {
+  Future<List<dynamic>> fetchWorkoutsWithImages(int complexId) async {
     await initCache();
-    if (_workoutsCache.containsKey(complexId)) return _workoutsCache[complexId]!;
+    if (_workoutsCache.containsKey(complexId)) return List<dynamic>.from(_workoutsCache[complexId]!);
+
     final response = await supabaseClient
         .from('workouts')
         .select()
         .eq('id_complex', complexId);
-    final data = response.toList();
-    _workoutsCache[complexId] = data;
+    final workouts = response.toList();
+    _workoutsCache[complexId] = workouts;
     await _saveWorkoutsCache();
+
+    final workoutIds = workouts.map((w) => w['id'] as int).toList();
+    if (workoutIds.isEmpty) return workouts;
+
+    final linksResponse = await supabaseClient
+        .from('workouts_exercises')
+        .select('id_workout, id_exercise')
+        .inFilter('id_workout', workoutIds)
+        .order('id', ascending: true);
+    final links = linksResponse.toList();
+
+    final exerciseIds = links.map((l) => l['id_exercise'] as int).toSet().toList();
+    final exercisesMap = <int, Map<String, dynamic>>{};
+    if (exerciseIds.isNotEmpty) {
+      final exercisesResponse = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
+      for (final ex in exercisesResponse) {
+        exercisesMap[ex['id'] as int] = ex;
+      }
+    }
+
+    final firstExercisePerWorkout = <int, Map<String, dynamic>>{};
+    for (final link in links) {
+      final wid = link['id_workout'] as int;
+      final eid = link['id_exercise'] as int;
+      if (!firstExercisePerWorkout.containsKey(wid) && exercisesMap.containsKey(eid)) {
+        firstExercisePerWorkout[wid] = exercisesMap[eid]!;
+      }
+    }
+
+    return workouts.map((w) {
+      final wid = w['id'] as int;
+      final firstEx = firstExercisePerWorkout[wid];
+      final result = Map<String, dynamic>.from(w);
+      if (firstEx != null) {
+        result['image'] = firstEx['image'] ?? '';
+      }
+      return result;
+    }).toList();
+  }
+
+  Future<List<dynamic>> fetchWorkouts(int complexId) async {
+    final data = await fetchWorkoutsWithImages(complexId);
     return data;
   }
 
@@ -592,14 +635,26 @@ class AuthService {
     try {
       final progressResponse = await supabaseClient.from('user_program_exercise_progress').select().eq('id_user_program', userProgramId).eq('day_number', dayNumber).order('exercise_order', ascending: true);
       final progressData = progressResponse.toList();
+      if (progressData.isEmpty) return [];
+
+      final exerciseIds = progressData.map((row) => row['exercise_id']).where((id) => id != null && id != -1).toList();
+
+      final exercisesMap = <int, Map<String, dynamic>>{};
+      if (exerciseIds.isNotEmpty) {
+        final exercisesResponse = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
+        for (final ex in exercisesResponse) {
+          exercisesMap[ex['id'] as int] = ex;
+        }
+      }
+
       final List<dynamic> result = [];
       for (final row in progressData) {
         final exerciseId = row['exercise_id'];
         if (exerciseId == -1 || exerciseId == null) {
           result.add({'progressId': row['id'], 'exerciseOrder': row['exercise_order'], 'completed': row['completed'] ?? false, 'completedAt': row['completed_at'], 'startedAt': row['started_at'], 'exercise': {'id': -1, 'name': 'Нет упражнения', 'image': '', 'description': 'Не добавлено', 'recommendedDurationSeconds': 60}});
         } else {
-          final exerciseResponse = await supabaseClient.from('exercises').select().eq('id', exerciseId).maybeSingle();
-          result.add({'progressId': row['id'], 'exerciseOrder': row['exercise_order'], 'completed': row['completed'] ?? false, 'completedAt': row['completed_at'], 'startedAt': row['started_at'], 'exercise': {'id': exerciseResponse?['id'] ?? exerciseId, 'name': exerciseResponse?['name_exercise'] ?? '', 'image': exerciseResponse?['image'] ?? '', 'video': exerciseResponse?['video'], 'description': exerciseResponse?['description'] ?? '', 'recommendedDurationSeconds': exerciseResponse?['recommended_duration_seconds'] ?? 60}});
+          final exercise = exercisesMap[exerciseId];
+          result.add({'progressId': row['id'], 'exerciseOrder': row['exercise_order'], 'completed': row['completed'] ?? false, 'completedAt': row['completed_at'], 'startedAt': row['started_at'], 'exercise': {'id': exercise?['id'] ?? exerciseId, 'name': exercise?['name_exercise'] ?? '', 'image': exercise?['image'] ?? '', 'video': exercise?['video'], 'description': exercise?['description'] ?? '', 'recommendedDurationSeconds': exercise?['recommended_duration_seconds'] ?? 60}});
         }
       }
       return result;

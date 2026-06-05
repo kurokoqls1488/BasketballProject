@@ -7,11 +7,17 @@
 android {
     namespace = "com.example.basketball_training"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.2.13676358"
+    ndkVersion = "29.0.14206865"
+
+    externalNativeBuild {
+        cmake {
+            version = "3.30.5"
+        }
+    }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
@@ -45,5 +51,5 @@ android {
 
 flutter {
     source = "../.."
-    target = "lib/services/main.dart"
+    target = "lib/main.dart"
 }

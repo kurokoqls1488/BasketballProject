@@ -51,38 +51,51 @@ class _TrainingPageState extends State<TrainingPage> {
     try {
       await AuthService.initCache();
       final programs = await _authService.fetchPrograms();
-      final Map<int, double> progressMap = {};
-      final Map<int, List<dynamic>> daysMap = {};
-      final Map<int, bool> completedMap = {};
 
-      for (final program in programs) {
+      final futures = programs.map((program) async {
         final programId = program['id'] as int? ?? 0;
-        if (programId > 0) {
-          final userProg = await _authService.getOrCreateUserProgram(programId);
-          final days = await _authService.fetchProgramDays(programId);
-          daysMap[programId] = days;
+        if (programId <= 0) return null;
 
-          if (userProg != null) {
-            // Инициализация упражнений для всех дней (параллельно)
-            await _authService.initializeAllProgramDays(userProg, days);
+        final userProg = await _authService.getOrCreateUserProgram(programId);
+        final days = await _authService.fetchProgramDays(programId);
+        Map<int, double> progressMap = {};
+        Map<int, bool> completedMap = {};
 
-            // НОВЫЙ БЫСТРЫЙ МЕТОД — читаем кэшированные данные из user_programs
-            final userProgData = await _authService.getUserProgram(userProg);
-            progressMap[programId] = (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
-            completedMap[programId] = userProgData?['is_completed'] as bool? ?? false;
-          } else {
-            progressMap[programId] = 0.0;
-            completedMap[programId] = false;
-          }
+        if (userProg != null) {
+          await _authService.initializeAllProgramDays(userProg, days);
+          final userProgData = await _authService.getUserProgram(userProg);
+          progressMap[programId] = (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
+          completedMap[programId] = userProgData?['is_completed'] as bool? ?? false;
+        } else {
+          progressMap[programId] = 0.0;
+          completedMap[programId] = false;
         }
+
+        return {'program': program, 'days': days, 'progress': progressMap[programId], 'completed': completedMap[programId]};
+      }).toList();
+
+      final results = await Future.wait(futures);
+      final filtered = results.where((r) => r != null).toList();
+
+      final allPrograms = filtered.map((r) => (r as Map<String, dynamic>)['program'] as Map<String, dynamic>).toList();
+      final allProgress = <int, double>{};
+      final allDays = <int, List<dynamic>>{};
+      final allCompleted = <int, bool>{};
+
+      for (final r in filtered) {
+        final map = r as Map<String, dynamic>;
+        final pid = (map['program'] as Map<String, dynamic>)['id'] as int;
+        allProgress[pid] = map['progress'] as double;
+        allDays[pid] = map['days'] as List<dynamic>;
+        allCompleted[pid] = map['completed'] as bool;
       }
 
       if (mounted) {
         setState(() {
-          _programs = programs;
-          _programProgressCache = progressMap;
-          _programDaysCache = daysMap;
-          _daysCompletedCache = completedMap;
+          _programs = allPrograms;
+          _programProgressCache = allProgress;
+          _programDaysCache = allDays;
+          _daysCompletedCache = allCompleted;
           _isLoading = false;
           _error = null;
         });
