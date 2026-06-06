@@ -97,17 +97,27 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
     if (_isTimerRunning || _remainingSeconds <= 0) return;
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return;
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
 
+      bool timerFinished = false;
       setState(() {
-        if (_remainingSeconds > 0) {
+        if (_remainingSeconds > 1) {
           _remainingSeconds--;
-        } else {
-          _timer?.cancel();
+        } else if (_remainingSeconds == 1) {
+          _remainingSeconds = 0;
           _isTimerRunning = false;
           _showTimerComplete = true;
+          timerFinished = true;
         }
       });
+      
+      if (timerFinished) {
+        timer.cancel();
+        SettingsService.playTimerCompleteSound();
+      }
     });
 
     _isTimerRunning = true;

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'locale_service.dart';
 import 'auth_service.dart';
 
@@ -47,7 +47,7 @@ class SettingsService {
     }
   }
 
-  static Future<void> _vibrate() async {
+static Future<void> _vibrate() async {
     try {
       final hasVibrator = await Vibration.hasVibrator();
       if (hasVibrator) {
@@ -59,16 +59,23 @@ class SettingsService {
   }
 
   static Future<void> playClickSound() async {
-    debugPrint('playClickSound called - soundEnabled: $_soundEnabled');
     if (!_soundEnabled) return;
 
     try {
-      debugPrint('Playing sound...');
-      final player = AudioPlayer();
-      await player.play(AssetSource('sounds/button-click.mp3'));
-      debugPrint('Sound playing');
+      await HapticFeedback.selectionClick();
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Haptic sound error: $e');
+    }
+  }
+
+  static Future<void> playTimerCompleteSound() async {
+    try {
+      if (_vibrationEnabled) {
+        await Vibration.vibrate(duration: 500);
+      }
+      await HapticFeedback.heavyImpact();
+    } catch (e) {
+      debugPrint('Timer complete error: $e');
     }
   }
 

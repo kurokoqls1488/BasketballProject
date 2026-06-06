@@ -103,7 +103,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     }
   }
 
-  void _startTimerForCurrentExercise() {
+void _startTimerForCurrentExercise() {
     _timer?.cancel();
     final currentExercise = _exercises[_currentIndex];
     final durationSeconds = currentExercise['exercise']['recommendedDurationSeconds'] as int?;
@@ -125,14 +125,21 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
         timer.cancel();
         return;
       }
+      bool timerFinished = false;
       setState(() {
-        if (_remainingSeconds > 0) {
+        if (_remainingSeconds > 1) {
           _remainingSeconds--;
-        } else {
+        } else if (_remainingSeconds == 1) {
+          _remainingSeconds = 0;
           _isTimerRunning = false;
           _showTimerComplete = true;
+          timerFinished = true;
         }
       });
+      if (timerFinished) {
+        timer.cancel();
+        SettingsService.playTimerCompleteSound();
+      }
     });
   }
 
@@ -143,7 +150,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     });
   }
 
-  void _resumeTimer() {
+void _resumeTimer() {
     if (_remainingSeconds > 0 && !_isTimerRunning) {
       setState(() {
         _isTimerRunning = true;
@@ -154,14 +161,21 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
           timer.cancel();
           return;
         }
+        bool timerFinished = false;
         setState(() {
-          if (_remainingSeconds > 0) {
+          if (_remainingSeconds > 1) {
             _remainingSeconds--;
-          } else {
+          } else if (_remainingSeconds == 1) {
+            _remainingSeconds = 0;
             _isTimerRunning = false;
             _showTimerComplete = true;
+            timerFinished = true;
           }
         });
+        if (timerFinished) {
+          timer.cancel();
+          SettingsService.playTimerCompleteSound();
+        }
       });
     }
   }
