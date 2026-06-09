@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'locale_service.dart';
 import 'auth_service.dart';
 
@@ -63,12 +63,20 @@ class SettingsService {
     if (!_soundEnabled) return;
 
     try {
-      debugPrint('Playing sound...');
-      final player = AudioPlayer();
-      await player.play(AssetSource('sounds/button-click.mp3'));
-      debugPrint('Sound playing');
+      await SystemSound.play(SystemSoundType.click);
     } catch (e) {
       debugPrint('Sound error: $e');
+    }
+  }
+
+  static Future<void> playTimerCompleteSound() async {
+    debugPrint('playTimerCompleteSound called - soundEnabled: $_soundEnabled');
+    if (!_soundEnabled) return;
+
+    try {
+      await SystemSound.play(SystemSoundType.alert);
+    } catch (e) {
+      debugPrint('Timer complete sound error: $e');
     }
   }
 

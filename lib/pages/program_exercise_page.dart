@@ -125,14 +125,18 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
         timer.cancel();
         return;
       }
+      final wasPositive = _remainingSeconds > 0;
       setState(() {
-        if (_remainingSeconds > 0) {
+        if (wasPositive) {
           _remainingSeconds--;
         } else {
           _isTimerRunning = false;
           _showTimerComplete = true;
         }
       });
+      if (wasPositive && _remainingSeconds == 0) {
+        SettingsService.playTimerCompleteSound();
+      }
     });
   }
 
@@ -154,14 +158,18 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
           timer.cancel();
           return;
         }
+        final wasPositive = _remainingSeconds > 0;
         setState(() {
-          if (_remainingSeconds > 0) {
+          if (wasPositive) {
             _remainingSeconds--;
           } else {
             _isTimerRunning = false;
             _showTimerComplete = true;
           }
         });
+        if (wasPositive && _remainingSeconds == 0) {
+          SettingsService.playTimerCompleteSound();
+        }
       });
     }
   }

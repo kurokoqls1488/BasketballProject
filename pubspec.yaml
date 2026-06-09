@@ -19,7 +19,6 @@ dependencies:
   cached_network_image: ^3.3.1
   flutter_native_splash: ^2.3.0
   vibration: ^2.0.0
-  audioplayers: ^5.0.1
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
@@ -46,7 +45,6 @@ flutter:
     - images/
     - icons/
     - videos/
-    - sounds/
     - images/brosok.jpg
     - images/drible.jpg
     - images/finished.jpg
@@ -59,4 +57,3 @@ flutter:
     - images/basketball_ico.png
     - images/basketball_fon.jpg
     - images/pustoe_photo.png
-    - sounds/button-click.mp3

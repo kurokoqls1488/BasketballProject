@@ -281,8 +281,8 @@ class _HomeContentState extends State<HomeContent> {
               children: [
                 // Иконка баскетбольного мяча
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -294,8 +294,8 @@ class _HomeContentState extends State<HomeContent> {
                   ),
                   child: Image.asset(
                     'images/basketball_ico.png',
-                    width: 40,
-                    height: 40,
+                    width: 50,
+                    height: 50,
                     fit: BoxFit.cover,
                   ),
                 ),
