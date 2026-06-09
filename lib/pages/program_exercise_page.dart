@@ -103,7 +103,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     }
   }
 
-  void _startTimerForCurrentExercise() {
+void _startTimerForCurrentExercise() {
     _timer?.cancel();
     final currentExercise = _exercises[_currentIndex];
     final durationSeconds = currentExercise['exercise']['recommendedDurationSeconds'] as int?;
@@ -120,21 +120,24 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
       _isTimerRunning = true;
       _showTimerComplete = false;
     });
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+_timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
-      final wasPositive = _remainingSeconds > 0;
+      bool timerFinished = false;
       setState(() {
-        if (wasPositive) {
+        if (_remainingSeconds > 1) {
           _remainingSeconds--;
-        } else {
+        } else if (_remainingSeconds == 1) {
+          _remainingSeconds = 0;
           _isTimerRunning = false;
           _showTimerComplete = true;
+          timerFinished = true;
         }
       });
-      if (wasPositive && _remainingSeconds == 0) {
+      if (timerFinished) {
+        timer.cancel();
         SettingsService.playTimerCompleteSound();
       }
     });
@@ -158,16 +161,19 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
           timer.cancel();
           return;
         }
-        final wasPositive = _remainingSeconds > 0;
+        bool timerFinished = false;
         setState(() {
-          if (wasPositive) {
+          if (_remainingSeconds > 1) {
             _remainingSeconds--;
-          } else {
+          } else if (_remainingSeconds == 1) {
+            _remainingSeconds = 0;
             _isTimerRunning = false;
             _showTimerComplete = true;
+            timerFinished = true;
           }
         });
-        if (wasPositive && _remainingSeconds == 0) {
+        if (timerFinished) {
+          timer.cancel();
           SettingsService.playTimerCompleteSound();
         }
       });

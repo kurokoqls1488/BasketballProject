@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'locale_service.dart';
@@ -59,22 +60,23 @@ class SettingsService {
   }
 
   static Future<void> playClickSound() async {
-    debugPrint('playClickSound called - soundEnabled: $_soundEnabled');
     if (!_soundEnabled) return;
 
     try {
-      await SystemSound.play(SystemSoundType.click);
+      await HapticFeedback.selectionClick();
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Click sound error: $e');
     }
   }
 
   static Future<void> playTimerCompleteSound() async {
-    debugPrint('playTimerCompleteSound called - soundEnabled: $_soundEnabled');
     if (!_soundEnabled) return;
 
     try {
-      await SystemSound.play(SystemSoundType.alert);
+      if (_vibrationEnabled) {
+        await Vibration.vibrate(duration: 500);
+      }
+      await HapticFeedback.heavyImpact();
     } catch (e) {
       debugPrint('Timer complete sound error: $e');
     }
