@@ -144,7 +144,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
             child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
         Container(
-          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : Colors.grey[900],
+          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : const Color(0xFF121212),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(

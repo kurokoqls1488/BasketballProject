@@ -9,7 +9,7 @@ class SettingsService {
   static const String _backgroundKey = 'background_enabled';
 
   static bool _vibrationEnabled = true;
-  static bool _backgroundEnabled = true;
+  static bool _backgroundEnabled = false;
 
   static bool get vibrationEnabled => _vibrationEnabled;
   static bool get backgroundEnabled => _backgroundEnabled;
@@ -19,7 +19,7 @@ class SettingsService {
   static Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     _vibrationEnabled = prefs.getBool(_vibrationKey) ?? true;
-    _backgroundEnabled = prefs.getBool(_backgroundKey) ?? true;
+    _backgroundEnabled = prefs.getBool(_backgroundKey) ?? false;
     debugPrint(
       'Settings loaded - vibration: $_vibrationEnabled, background: $_backgroundEnabled',
     );

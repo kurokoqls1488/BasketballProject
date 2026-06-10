@@ -51,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Positioned.fill(
             child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
-        Container(color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : Colors.grey[900]),
+        Container(color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : const Color(0xFF121212)),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(

@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
         Container(
-          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : Colors.grey[900],
+          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : const Color(0xFF121212),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: _buildBody(),
