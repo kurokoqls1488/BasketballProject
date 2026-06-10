@@ -186,9 +186,9 @@ class LocaleService {
       'ru': 'Убрать фон',
       'en': 'Remove background',
     },
-    'Отображать фоновое изображение': {
-      'ru': 'Отображать фоновое изображение',
-      'en': 'Show background image',
+    'Показать темный фон': {
+      'ru': 'Показать темный фон',
+      'en': 'Show dark background',
     },
     'Данные': {'ru': 'Данные', 'en': 'Data'},
     'Очистка кэша': {'ru': 'Очистка кэша', 'en': 'Clear cache'},

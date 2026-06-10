@@ -9,7 +9,7 @@ class SettingsService {
   static const String _backgroundKey = 'background_enabled';
 
   static bool _vibrationEnabled = true;
-  static bool _backgroundEnabled = false;
+  static bool _backgroundEnabled = true;
 
   static bool get vibrationEnabled => _vibrationEnabled;
   static bool get backgroundEnabled => _backgroundEnabled;
