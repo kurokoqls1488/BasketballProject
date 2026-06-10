@@ -254,7 +254,6 @@ class _LoginPageState extends State<LoginPage> {
                                 : (canSubmit
                                       ? () {
                                           SettingsService.vibrate();
-                                          SettingsService.playClickSound();
                                           _handleLogin();
                                         }
                                       : null),
@@ -286,7 +285,6 @@ class _LoginPageState extends State<LoginPage> {
                           GestureDetector(
                             onTap: () {
                               SettingsService.vibrate();
-                              SettingsService.playClickSound();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

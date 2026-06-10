@@ -263,7 +263,6 @@ class _DayDetailPageState extends State<DayDetailPage> {
                                      child: InkWell(
                                         onTap: () {
                                           SettingsService.vibrate();
-                                          SettingsService.playClickSound();
                                           final exerciseId = exercise?['id'] as int?;
                                           if (exerciseId != null) {
                                             final imageUrl = exercise?['image'] as String? ?? '';

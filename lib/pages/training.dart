@@ -113,7 +113,6 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Future<void> _startProgram(int programId) async {
     SettingsService.vibrate();
-    SettingsService.playClickSound();
     final userProgramId = await _authService.getOrCreateUserProgram(programId);
     if (userProgramId == null) {
       if (mounted) {
@@ -252,7 +251,6 @@ class _TrainingPageState extends State<TrainingPage> {
         child: InkWell(
           onTap: () {
             SettingsService.vibrate();
-            SettingsService.playClickSound();
              Navigator.push(
                context,
                MaterialPageRoute(

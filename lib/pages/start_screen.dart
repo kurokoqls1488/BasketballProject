@@ -61,11 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-        ),
+        if (SettingsService.backgroundEnabled)
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+          ),
         Container(
-          color: Colors.black.withOpacity(0.3),
+          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : Colors.grey[900],
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: _buildBody(),
@@ -387,7 +388,6 @@ class _HomeContentState extends State<HomeContent> {
                               ),
                               onPressed: () {
                                 SettingsService.vibrate();
-                                SettingsService.playClickSound();
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -626,7 +626,6 @@ class _HomeContentState extends State<HomeContent> {
         child: InkWell(
           onTap: () {
             SettingsService.vibrate();
-            SettingsService.playClickSound();
             Navigator.push(
               context,
               MaterialPageRoute(

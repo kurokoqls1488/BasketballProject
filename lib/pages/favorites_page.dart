@@ -110,7 +110,6 @@ class _FavoritesPageState extends State<FavoritesPage> with SingleTickerProvider
           child: InkWell(
             onTap: () {
               SettingsService.vibrate();
-              SettingsService.playClickSound();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -245,7 +244,6 @@ Expanded(
          child: InkWell(
            onTap: () {
              SettingsService.vibrate();
-             SettingsService.playClickSound();
              Navigator.push(
                context,
                MaterialPageRoute(
@@ -296,8 +294,7 @@ Expanded(
                           size: 20,
                         ),
                         onPressed: () async {
-                          SettingsService.vibrate();
-                          SettingsService.playClickSound();
+    SettingsService.vibrate();
                           await _authService.removeExerciseFromFavorites(exerciseId);
                           _loadFavorites();
                         },

@@ -171,7 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: _t('Избранное'),
                   onTap: () {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -186,7 +185,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: _t('Настройки'),
                   onTap: () {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -201,7 +199,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: _t('Политика конфиденциальности'),
                   onTap: () {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -216,7 +213,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: _t('О нас'),
                   onTap: () {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -316,7 +312,6 @@ class _ProfilePageState extends State<ProfilePage> {
           borderRadius: BorderRadius.circular(15),
           onTap: () {
             SettingsService.vibrate();
-            SettingsService.playClickSound();
             authProvider.logout();
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!context.mounted) return;

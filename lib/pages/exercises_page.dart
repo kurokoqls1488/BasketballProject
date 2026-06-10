@@ -228,7 +228,6 @@ class _ExercisesPageState extends State<ExercisesPage> {
             child: InkWell(
               onTap: () {
                 SettingsService.vibrate();
-                SettingsService.playClickSound();
                 Navigator.push(
                   context,
                   MaterialPageRoute(

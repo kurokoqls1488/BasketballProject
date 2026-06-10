@@ -133,7 +133,6 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
             ? InkWell(
                 onTap: () {
                   SettingsService.vibrate();
-                  SettingsService.playClickSound();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

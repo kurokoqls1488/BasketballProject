@@ -139,11 +139,12 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-        ),
+        if (SettingsService.backgroundEnabled)
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+          ),
         Container(
-          color: Colors.black.withOpacity(0.6),
+          color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : Colors.grey[900],
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -369,7 +370,6 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                       GestureDetector(
                         onTap: () {
                           SettingsService.vibrate();
-                          SettingsService.playClickSound();
                           setState(() {
                             _policyAccepted = !_policyAccepted;
                           });
@@ -415,7 +415,6 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                                       child: GestureDetector(
                                         onTap: () {
                                           SettingsService.vibrate();
-                                          SettingsService.playClickSound();
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -468,7 +467,6 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                                 : (canSubmit
                                       ? () {
                                           SettingsService.vibrate();
-                                          SettingsService.playClickSound();
                                           _handleRegister();
                                         }
                                       : null),
@@ -499,8 +497,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              SettingsService.vibrate();
-                              SettingsService.playClickSound();
+    SettingsService.vibrate();
                               Navigator.pop(context);
                             },
                             child: Text(

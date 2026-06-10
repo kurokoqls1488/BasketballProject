@@ -177,8 +177,7 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
         child: InkWell(
           onTap: () {
             SettingsService.vibrate();
-            SettingsService.playClickSound();
-            Navigator.push(
+              Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ExercisesPage(

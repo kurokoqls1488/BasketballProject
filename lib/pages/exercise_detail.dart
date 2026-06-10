@@ -116,7 +116,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
       
       if (timerFinished) {
         timer.cancel();
-        SettingsService.playTimerCompleteSound();
+        SettingsService.vibrate();
       }
     });
 
@@ -181,7 +181,6 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
 
   void _toggleTimer() {
     SettingsService.vibrate();
-    SettingsService.playClickSound();
     if (_remainingSeconds <= 0) return;
     setState(() {
       if (_isTimerRunning) {

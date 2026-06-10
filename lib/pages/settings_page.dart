@@ -10,8 +10,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _soundEnabled = true;
   bool _vibrationEnabled = true;
+  bool _backgroundEnabled = true;
   String _selectedLanguage = 'ru';
 
   String _t(String key) => LocaleService.translate(key);
@@ -37,8 +37,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _loadSettings() {
     setState(() {
-      _soundEnabled = SettingsService.soundEnabled;
       _vibrationEnabled = SettingsService.vibrationEnabled;
+      _backgroundEnabled = SettingsService.backgroundEnabled;
       _selectedLanguage = LocaleService.currentLanguage;
     });
   }
@@ -47,10 +47,11 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-        ),
-        Container(color: Colors.black.withOpacity(0.3)),
+        if (SettingsService.backgroundEnabled)
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+          ),
+        Container(color: SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : Colors.grey[900]),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
@@ -98,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  _t('Звук и вибрация'),
+                  _t('Вибрация'),
                   style: const TextStyle(
                     color: Color(0xFFFFA500),
                     fontSize: 18,
@@ -107,20 +108,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 15),
                 _buildSwitchTile(
-                  title: _t('Звуковые эффекты'),
-                  subtitle: _t('Воспроизводить звуки при действиях'),
-                  value: _soundEnabled,
-                  onChanged: (value) async {
-                    await SettingsService.setSoundEnabled(value);
-                    if (value) {
-                      SettingsService.playClickSound();
-                    }
-                    setState(() {
-                      _soundEnabled = value;
-                    });
-                  },
-                ),
-                _buildSwitchTile(
                   title: _t('Вибрация'),
                   subtitle: _t('Вибрация при нажатиях'),
                   value: _vibrationEnabled,
@@ -128,6 +115,27 @@ class _SettingsPageState extends State<SettingsPage> {
                     await SettingsService.setVibrationEnabled(value);
                     setState(() {
                       _vibrationEnabled = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  _t('Фон'),
+                  style: const TextStyle(
+                    color: Color(0xFFFFA500),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                _buildSwitchTile(
+                  title: _t('Убрать фон'),
+                  subtitle: _t('Отображать фоновое изображение'),
+                  value: _backgroundEnabled,
+                  onChanged: (value) async {
+                    await SettingsService.setBackgroundEnabled(value);
+                    setState(() {
+                      _backgroundEnabled = value;
                     });
                   },
                 ),

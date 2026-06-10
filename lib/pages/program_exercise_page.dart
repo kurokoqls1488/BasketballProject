@@ -138,7 +138,7 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       });
       if (timerFinished) {
         timer.cancel();
-        SettingsService.playTimerCompleteSound();
+        SettingsService.vibrate();
       }
     });
   }
@@ -174,7 +174,7 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         });
         if (timerFinished) {
           timer.cancel();
-          SettingsService.playTimerCompleteSound();
+          SettingsService.vibrate();
         }
       });
     }
@@ -182,7 +182,6 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
 
   void _toggleTimer() {
     SettingsService.vibrate();
-    SettingsService.playClickSound();
     if (_remainingSeconds <= 0) return;
     setState(() {
       if (_isTimerRunning) {
@@ -798,7 +797,6 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
                 child: ElevatedButton(
                   onPressed: _currentIndex > 0 ? () {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     _goToPrevious();
                   } : null,
                   style: ElevatedButton.styleFrom(
@@ -821,7 +819,6 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
                 child: ElevatedButton(
                   onPressed: () async {
                     SettingsService.vibrate();
-                    SettingsService.playClickSound();
                     final currentCompleted = isCompleted;
                     if (!currentCompleted) {
                       await _toggleComplete();
