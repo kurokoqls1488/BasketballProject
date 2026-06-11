@@ -154,7 +154,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ),
               centerTitle: true,
             ),
-          body: Padding(
+            body: Padding(
             padding: const EdgeInsets.all(30),
             child: Form(
               key: _formKey,
@@ -273,25 +273,25 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: _resendCooldown > 0 ? null : _resendCode,
-                    child: Text(
-                      _resendCooldown > 0
-                          ? '${_t('Отправить повторно')} ($_resendCooldown)'
-                          : _t('Отправить код повторно'),
-                      style: TextStyle(
-                        color: _resendCooldown > 0 ? Colors.grey : Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+const SizedBox(height: 20),
+                   TextButton(
+                     onPressed: _resendCooldown > 0 ? null : _resendCode,
+                     child: Text(
+                       _resendCooldown > 0
+                           ? '${_t('Отправить повторно')} ($_resendCooldown)'
+                           : _t('Отправить код повторно'),
+                       style: TextStyle(
+                         color: _resendCooldown > 0 ? Colors.grey : Colors.white70,
+                         fontSize: 14,
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+             ),
+           ),
+         ],
+       ),
+     );
   }
 }

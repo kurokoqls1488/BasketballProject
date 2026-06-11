@@ -57,57 +57,58 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
               ),
               centerTitle: true,
             ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFFA500), Color(0xFFDC143C)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF4500).withOpacity(0.5),
-                          blurRadius: 15,
-                          spreadRadius: 3,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFA500), Color(0xFFDC143C)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.shield,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color(0xFFFFA500).withOpacity(0.3),
-                        width: 1,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF4500).withOpacity(0.5),
+                            blurRadius: 15,
+                            spreadRadius: 3,
+                          ),
+                        ],
                       ),
-                    ),
-                    child: Text(
-                      _t('privacy_text'),
-                      style: const TextStyle(
-                        fontSize: 14,
+                      child: const Icon(
+                        Icons.shield,
                         color: Colors.white,
-                        height: 1.6,
+                        size: 40,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 25),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFFFFA500).withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        _t('privacy_text'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          height: 1.6,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

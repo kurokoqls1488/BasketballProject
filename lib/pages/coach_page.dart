@@ -81,7 +81,7 @@ class _CoachPageState extends State<CoachPage> {
     _scrollToBottom();
   }
 
-  String _t(String key) => LocaleService.translate(key);
+String _t(String key) => LocaleService.translate(key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,15 +97,16 @@ class _CoachPageState extends State<CoachPage> {
             color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.5) : const Color(0xFF121212),
             child: SafeArea(
               child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: _messages.isEmpty
-                      ? _buildEmptyState()
-                      : _buildChatList(),
-                ),
-                _buildInputBar(),
-              ],
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: _messages.isEmpty
+                        ? _buildEmptyState()
+                        : _buildChatList(),
+                  ),
+                  _buildInputBar(),
+                ],
+              ),
             ),
           ),
         ],
