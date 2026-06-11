@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
 import '../services/locale_service.dart';
-import '../services/settings_service.dart';
 import 'start_screen.dart';
 
 class OTPVerificationPage extends StatefulWidget {
@@ -150,56 +149,56 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ),
               centerTitle: true,
             ),
-body: Padding(
-             padding: const EdgeInsets.all(30),
-             child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.email_outlined,
-                    size: 80,
-                    color: Colors.orange[400],
-                  ),
-                  const SizedBox(height: 30),
-                  Text(
-                    _t('Введите код подтверждения'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            body: Padding(
+              padding: const EdgeInsets.all(30),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      size: 80,
+                      color: Colors.orange[400],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.email,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _t('Код отправлен на вашу почту'),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: const Color(0xFFFFA500).withOpacity(0.3),
-                        width: 1,
+                    const SizedBox(height: 30),
+                    Text(
+                      _t('Введите код подтверждения'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.email,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _t('Код отправлен на вашу почту'),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: const Color(0xFFFFA500).withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
                       child: TextFormField(
                         controller: _otpController,
                         validator: _validateOTP,
@@ -227,47 +226,48 @@ body: Padding(
                           ),
                         ),
                       ),
-                  ),
-                  const SizedBox(height: 30),
-                  Container(
-                    width: double.infinity,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFFA500), Color(0xFFDC143C)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF4500).withOpacity(0.4),
-                          blurRadius: 15,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
+                    const SizedBox(height: 30),
+                    Container(
+                      width: double.infinity,
+                      height: 55,
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        onTap: _isSubmitting ? null : _verifyOTP,
-                        child: Center(
-                          child: _isSubmitting
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : Text(
-                                  _t('Подтвердить'),
-                                  style: const TextStyle(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFA500), Color(0xFFDC143C)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF4500).withOpacity(0.4),
+                            blurRadius: 15,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: _isSubmitting ? null : _verifyOTP,
+                          child: Center(
+                            child: _isSubmitting
+                                ? const CircularProgressIndicator(
                                     color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                  )
+                                : Text(
+                                    _t('Подтвердить'),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
+                          ),
                         ),
                       ),
-                      ),
+                    ),
                     const SizedBox(height: 20),
                     TextButton(
                       onPressed: _resendCooldown > 0 ? null : _resendCode,
@@ -285,8 +285,9 @@ body: Padding(
                 ),
               ),
             ),
-          ],
+          ),
         ),
-      );
+      ],
+    );
   }
 }
