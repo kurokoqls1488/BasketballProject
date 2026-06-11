@@ -345,17 +345,13 @@ Expanded(
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (!SettingsService.backgroundEnabled)
-          Positioned.fill(
-            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-          ),
         Container(
-          color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : const Color(0xFF121212),
+          color: const Color(0xFF121212),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: Text(_t('Избранное')),
-              backgroundColor: !SettingsService.backgroundEnabled ? Colors.transparent : const Color(0xFF1A1A1A),
+              backgroundColor: Colors.transparent,
               foregroundColor: const Color(0xFFFFA500),
               centerTitle: true,
               bottom: TabBar(

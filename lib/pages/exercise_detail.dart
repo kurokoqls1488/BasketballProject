@@ -204,21 +204,16 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
     final translatedDesc = LocaleService.translateDbData(widget.description);
 
     return Scaffold(
-      backgroundColor: SettingsService.backgroundEnabled ? const Color(0xFF121212) : Colors.transparent,
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(translatedName),
-        backgroundColor: SettingsService.backgroundEnabled ? const Color(0xFF121212) : Colors.transparent,
+        backgroundColor: const Color(0xFF121212),
         foregroundColor: const Color(0xFFFFA500),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          if (!SettingsService.backgroundEnabled)
-            Positioned.fill(
-              child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-            ),
-          if (!SettingsService.backgroundEnabled)
-            Container(color: Colors.black.withOpacity(0.3)),
+          Container(color: Colors.black.withOpacity(0.3)),
           Positioned.fill(
             child: SingleChildScrollView(
               child: Column(

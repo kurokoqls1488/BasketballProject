@@ -129,12 +129,8 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (!SettingsService.backgroundEnabled)
-          Positioned.fill(
-            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-          ),
         Container(
-          color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : const Color(0xFF121212),
+          color: const Color(0xFF121212),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -271,7 +267,7 @@ body: Padding(
                                 ),
                         ),
                       ),
-),
+                      ),
                     const SizedBox(height: 20),
                     TextButton(
                       onPressed: _resendCooldown > 0 ? null : _resendCode,
