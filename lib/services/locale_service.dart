@@ -55,7 +55,7 @@ class LocaleService {
 
   static String translateDbData(String text) {
     if (text.isEmpty) return text;
-    
+
     // Если текущий язык русский
     if (_currentLanguage == 'ru') {
       // Если текст уже есть в ключах (это русский), возвращаем как есть
@@ -80,7 +80,7 @@ class LocaleService {
     'Защита': 'Defense',
     'Реабилитация': 'Rehabilitation',
     'Физическая подготовка': 'Physical Training',
-    
+
     // Тренировки (workouts)
     'Утренняя тренировка': 'Morning Workout',
     'Вечерняя тренировка': 'Evening Workout',
@@ -93,7 +93,7 @@ class LocaleService {
     'Растяжка': 'Stretching',
     'Силовая тренировка': 'Strength Training',
     'Кардио тренировка': 'Cardio Training',
-    
+
     // Общие
     'Баскетбол': 'Basketball',
     'Тренировка': 'Training',
@@ -104,7 +104,7 @@ class LocaleService {
     'Продвинутый': 'Advanced',
     'Для всех': 'For All',
     'Нет упражнения': 'No exercise',
-    
+
     // Упражнения (короткие названия)
     'Бросок': 'Shooting',
     'Завершение': 'Finishing',
@@ -153,20 +153,23 @@ class LocaleService {
     'Прыжки на месте': 'Standing Jumps',
     'Подъемы на икры': 'Calf Raises',
     'Ротация голеностопа с резинкой': 'Ankle Band Rotation',
-'Ходьба на пятках': 'Heel Walks',
-     
-     // Программы
-     'Неделя новичка': 'Beginner Week',
-     'Две недели': 'Two Weeks',
-     'Месяц мастера': 'Master\'s Month',
-     'Базовая программа для начинающих. 7 дней тренировок.': 'Basic program for beginners. 7 days of training.',
-     'Программа на 14 дней для развития базовых навыков.': '14-day program for developing basic skills.',
-     'Интенсивная программа на 30 дней для продвинутых.': 'Intensive 30-day program for advanced users.',
-     'Политика конфиденциальности': 'Privacy Policy',
+    'Ходьба на пятках': 'Heel Walks',
+
+    // Программы
+    'Неделя новичка': 'Beginner Week',
+    'Две недели': 'Two Weeks',
+    'Месяц мастера': 'Master\'s Month',
+    'Базовая программа для начинающих. 7 дней тренировок.':
+        'Basic program for beginners. 7 days of training.',
+    'Программа на 14 дней для развития базовых навыков.':
+        '14-day program for developing basic skills.',
+    'Интенсивная программа на 30 дней для продвинутых.':
+        'Intensive 30-day program for advanced users.',
+    'Политика конфиденциальности': 'Privacy Policy',
   };
 
   // Обратный словарь для перевода с английского на русский (строится автоматически)
-  static final Map<String, String> _dbTranslationsReverse = 
+  static final Map<String, String> _dbTranslationsReverse =
       _dbTranslations.map((key, value) => MapEntry(value, key));
 
   // Интерфейсные переводы (все кнопки, заголовки, сообщения)
@@ -180,15 +183,6 @@ class LocaleService {
     'Вибрация при нажатиях': {
       'ru': 'Вибрация при нажатиях',
       'en': 'Vibration on taps',
-    },
-    'Фон': {'ru': 'Фон', 'en': 'Background'},
-    'Убрать фон': {
-      'ru': 'Убрать фон',
-      'en': 'Remove background',
-    },
-    'Показать темный фон': {
-      'ru': 'Показать темный фон',
-      'en': 'Show dark background',
     },
     'Данные': {'ru': 'Данные', 'en': 'Data'},
     'Очистка кэша': {'ru': 'Очистка кэша', 'en': 'Clear cache'},
@@ -205,7 +199,10 @@ class LocaleService {
     'Вы уверены?': {'ru': 'Вы уверены?', 'en': 'Are you sure?'},
     'Очистить': {'ru': 'Очистить', 'en': 'Clear'},
     'Кэш очищен': {'ru': 'Кэш очищен', 'en': 'Cache cleared'},
-    'Политика конфиденциальности': {'ru': 'Политика конфиденциальности', 'en': 'Privacy Policy'},
+    'Политика конфиденциальности': {
+      'ru': 'Политика конфиденциальности',
+      'en': 'Privacy Policy'
+    },
     'Basketball Training Team': {
       'ru': 'Basketball Training Team',
       'en': 'Basketball Training Team',
@@ -223,73 +220,73 @@ class LocaleService {
     'Избранное': {'ru': 'Избранное', 'en': 'Favorites'},
     'Профиль': {'ru': 'Профиль', 'en': 'Profile'},
     'Вход': {'ru': 'Вход', 'en': 'Login'},
-'Регистрация': {'ru': 'Регистрация', 'en': 'Register'},
-     'Email': {'ru': 'Email', 'en': 'Email'},
-     'Пароль': {'ru': 'Пароль', 'en': 'Password'},
-      'Выйти': {'ru': 'Выйти', 'en': 'Logout'},
+    'Регистрация': {'ru': 'Регистрация', 'en': 'Register'},
+    'Email': {'ru': 'Email', 'en': 'Email'},
+    'Пароль': {'ru': 'Пароль', 'en': 'Password'},
+    'Выйти': {'ru': 'Выйти', 'en': 'Logout'},
     'Зарегистрироваться': {'ru': 'Зарегистрироваться', 'en': 'Register'},
-     'Нет аккаунта?': {'ru': 'Нет аккаунта?', 'en': 'No account?'},
-     'Есть аккаунт?': {'ru': 'Есть аккаунт?', 'en': 'Have an account?'},
+    'Нет аккаунта?': {'ru': 'Нет аккаунта?', 'en': 'No account?'},
+    'Есть аккаунт?': {'ru': 'Есть аккаунт?', 'en': 'Have an account?'},
 
-     // Политика конфиденциальности
-     'privacy_title': {
-       'ru': 'Политика конфиденциальности',
-       'en': 'Privacy Policy',
-     },
-     'privacy_text': {
-        'ru': 'Мы ценим вашу конфиденциальность. Данная политика объясняет, как мы собираем, используем и защищаем вашу информацию.\n\n'
-             '1. Сбор данных\n'
-             'Мы собираем только те данные, которые вы предоставляете добровольно при регистрации: email, никнейм и avatar (если загрузите).\n'
-             'Дополнительно мы автоматически сохраняем ваш прогресс тренировок, избранные упражнения и настройки приложения.\n\n'
-             '2. Использование данных\n'
-             'Ваши данные используются для:\n'
-             '   - Авторизации в приложении\n'
-             '   - Сохранения вашего прогресса тренировок\n'
-             '   - Персонализации интерфейса (язык, настройки)\n'
-             '   - Улучшения качества приложения\n\n'
-             '3. Хранение данных\n'
-             'Данные хранятся в защищённых облачных сервисах (Supabase). Мы применяем стандартные меры безопасности для защиты от несанкционированного доступа.\n\n'
-             '4. Передача данных третьим лицам\n'
-             'Мы НЕ продаём и НЕ передаём ваши персональные данные третьим лицам. Данные могут быть доступны только вам и администраторам приложения.\n\n'
-             '5. Ваши права\n'
-             'Вы можете в любой момент:\n'
-             '   - Удалить свой аккаунт (все ваши данные будут безвозвратно удалены)\n'
-             '   - Изменить персональную информацию\n'
-             '   - Отозвать согласие на обработку данных\n\n'
-             '6. Cookie и отслеживание\n'
-             'Приложение не использует cookies и аналогичные технологии для отслеживания.\n\n'
-             '7. Изменения политики\n'
-             'Мы можем обновлять эту политику. Актуальная версия всегда доступна в приложении.\n\n'
-             '8. Контакты\n'
-             'По вопросам конфиденциальности пишите: gluk.dan@gmail.com\n\n'
-             'Дата последнего обновления: 2025',
-       'en': 'We value your privacy. This policy explains how we collect, use and protect your information.\n\n'
-             '1. Data Collection\n'
-             'We only collect data that you voluntarily provide during registration: email, nickname, and avatar (if uploaded).\n'
-             'Additionally, we automatically store your workout progress, favorite exercises, and app preferences.\n\n'
-             '2. Use of Data\n'
-             'Your data is used for:\n'
-             '   - Authentication in the app\n'
-             '   - Saving your workout progress\n'
-             '   - Personalizing the interface (language, settings)\n'
-             '   - Improving app quality\n\n'
-             '3. Data Storage\n'
-             'Data is stored in secure cloud services (Supabase). We apply standard security measures to protect against unauthorized access.\n\n'
-             '4. Data Sharing\n'
-             'We DO NOT sell or transfer your personal data to third parties. Data may be accessible only to you and app administrators.\n\n'
-             '5. Your Rights\n'
-             'You can at any time:\n'
-             '   - Delete your account (all your data will be permanently deleted)\n'
-             '   - Change personal information\n'
-             '   - Withdraw consent to data processing\n\n'
-             '6. Cookies & Tracking\n'
-             'The app does not use cookies or similar tracking technologies.\n\n'
-             '7. Policy Changes\n'
-             'We may update this policy. The current version is always available in the app.\n\n'
-             '8. Contact\n'
-             'For privacy inquiries email: gluk.dan@gmail.com\n\n'
-             'Last updated: 2025',
-     },
+    // Политика конфиденциальности
+    'privacy_title': {
+      'ru': 'Политика конфиденциальности',
+      'en': 'Privacy Policy',
+    },
+    'privacy_text': {
+      'ru': 'Мы ценим вашу конфиденциальность. Данная политика объясняет, как мы собираем, используем и защищаем вашу информацию.\n\n'
+          '1. Сбор данных\n'
+          'Мы собираем только те данные, которые вы предоставляете добровольно при регистрации: email, никнейм и avatar (если загрузите).\n'
+          'Дополнительно мы автоматически сохраняем ваш прогресс тренировок, избранные упражнения и настройки приложения.\n\n'
+          '2. Использование данных\n'
+          'Ваши данные используются для:\n'
+          '   - Авторизации в приложении\n'
+          '   - Сохранения вашего прогресса тренировок\n'
+          '   - Персонализации интерфейса (язык, настройки)\n'
+          '   - Улучшения качества приложения\n\n'
+          '3. Хранение данных\n'
+          'Данные хранятся в защищённых облачных сервисах (Supabase). Мы применяем стандартные меры безопасности для защиты от несанкционированного доступа.\n\n'
+          '4. Передача данных третьим лицам\n'
+          'Мы НЕ продаём и НЕ передаём ваши персональные данные третьим лицам. Данные могут быть доступны только вам и администраторам приложения.\n\n'
+          '5. Ваши права\n'
+          'Вы можете в любой момент:\n'
+          '   - Удалить свой аккаунт (все ваши данные будут безвозвратно удалены)\n'
+          '   - Изменить персональную информацию\n'
+          '   - Отозвать согласие на обработку данных\n\n'
+          '6. Cookie и отслеживание\n'
+          'Приложение не использует cookies и аналогичные технологии для отслеживания.\n\n'
+          '7. Изменения политики\n'
+          'Мы можем обновлять эту политику. Актуальная версия всегда доступна в приложении.\n\n'
+          '8. Контакты\n'
+          'По вопросам конфиденциальности пишите: gluk.dan@gmail.com\n\n'
+          'Дата последнего обновления: 2025',
+      'en': 'We value your privacy. This policy explains how we collect, use and protect your information.\n\n'
+          '1. Data Collection\n'
+          'We only collect data that you voluntarily provide during registration: email, nickname, and avatar (if uploaded).\n'
+          'Additionally, we automatically store your workout progress, favorite exercises, and app preferences.\n\n'
+          '2. Use of Data\n'
+          'Your data is used for:\n'
+          '   - Authentication in the app\n'
+          '   - Saving your workout progress\n'
+          '   - Personalizing the interface (language, settings)\n'
+          '   - Improving app quality\n\n'
+          '3. Data Storage\n'
+          'Data is stored in secure cloud services (Supabase). We apply standard security measures to protect against unauthorized access.\n\n'
+          '4. Data Sharing\n'
+          'We DO NOT sell or transfer your personal data to third parties. Data may be accessible only to you and app administrators.\n\n'
+          '5. Your Rights\n'
+          'You can at any time:\n'
+          '   - Delete your account (all your data will be permanently deleted)\n'
+          '   - Change personal information\n'
+          '   - Withdraw consent to data processing\n\n'
+          '6. Cookies & Tracking\n'
+          'The app does not use cookies or similar tracking technologies.\n\n'
+          '7. Policy Changes\n'
+          'We may update this policy. The current version is always available in the app.\n\n'
+          '8. Contact\n'
+          'For privacy inquiries email: gluk.dan@gmail.com\n\n'
+          'Last updated: 2025',
+    },
     'Главная': {'ru': 'Главная', 'en': 'Home'},
     'Тренировочные комплексы': {
       'ru': 'Тренировочные комплексы',
@@ -297,7 +294,10 @@ class LocaleService {
     },
     'Тренер AI': {'ru': 'Тренер AI', 'en': 'AI Coach'},
     'Online': {'ru': 'Online', 'en': 'Online'},
-    'Подтверждение email': {'ru': 'Подтверждение email', 'en': 'Email verification'},
+    'Подтверждение email': {
+      'ru': 'Подтверждение email',
+      'en': 'Email verification'
+    },
     'Привет! Я AI тренер': {
       'ru': 'Привет! Я AI тренер',
       'en': 'Hello! I\'m AI Coach',
@@ -337,29 +337,50 @@ class LocaleService {
     'Далее': {'ru': 'Далее', 'en': 'Next'},
     'Завершить день': {'ru': 'Завершить день', 'en': 'Finish day'},
     'Готово': {'ru': 'Готово', 'en': 'Done'},
-'Start': {'ru': 'Начать', 'en': 'Start'},
-     'Старт': {'ru': 'Старт', 'en': 'Start'},
-     'Continue': {'ru': 'Продолжить', 'en': 'Continue'},
-     'Сброс': {'ru': 'Сброс', 'en': 'Reset'},
+    'Start': {'ru': 'Начать', 'en': 'Start'},
+    'Старт': {'ru': 'Старт', 'en': 'Start'},
+    'Continue': {'ru': 'Продолжить', 'en': 'Continue'},
+    'Сброс': {'ru': 'Сброс', 'en': 'Reset'},
     'Training': {'ru': 'Программы', 'en': 'Training'},
-    'Unable to start program': {'ru': 'Не удалось начать программу', 'en': 'Unable to start program'},
-    'No exercises found for this day': {'ru': 'Упражнения не найдены для этого дня', 'en': 'No exercises found for this day'},
+    'Unable to start program': {
+      'ru': 'Не удалось начать программу',
+      'en': 'Unable to start program'
+    },
+    'No exercises found for this day': {
+      'ru': 'Упражнения не найдены для этого дня',
+      'en': 'No exercises found for this day'
+    },
     'Error': {'ru': 'Ошибка', 'en': 'Error'},
     'Retry': {'ru': 'Повторить', 'en': 'Retry'},
-    'No exercises found': {'ru': 'Упражнения не найдены', 'en': 'No exercises found'},
+    'No exercises found': {
+      'ru': 'Упражнения не найдены',
+      'en': 'No exercises found'
+    },
     'Program Days': {'ru': 'Дни программы', 'en': 'Program Days'},
     'Not started': {'ru': 'Не начато', 'en': 'Not started'},
     'Locked': {'ru': 'Заблокировано', 'en': 'Locked'},
     'No days found': {'ru': 'Дни не найдены', 'en': 'No days found'},
     'Workout': {'ru': 'Тренировка', 'en': 'Workout'},
-    'No programs found': {'ru': 'Программы не найдены', 'en': 'No programs found'},
+    'No programs found': {
+      'ru': 'Программы не найдены',
+      'en': 'No programs found'
+    },
     'День': {'ru': 'День', 'en': 'Day'},
-    'Please try again later': {'ru': 'Попробуйте позже', 'en': 'Please try again later'},
-    'Program has no days': {'ru': 'В программе нет дней', 'en': 'Program has no days'},
-    'Day not linked to workout': {'ru': 'День не привязан к тренировке', 'en': 'Day not linked to workout'},
+    'Please try again later': {
+      'ru': 'Попробуйте позже',
+      'en': 'Please try again later'
+    },
+    'Program has no days': {
+      'ru': 'В программе нет дней',
+      'en': 'Program has no days'
+    },
+    'Day not linked to workout': {
+      'ru': 'День не привязан к тренировке',
+      'en': 'Day not linked to workout'
+    },
     'Complete': {'ru': 'Завершить', 'en': 'Complete'},
     'Завершить': {'ru': 'Завершить', 'en': 'Complete'},
-    
+
     // Для экрана упражнений
     'Exercise': {'ru': 'Упражнение', 'en': 'Exercise'},
     'Day': {'ru': 'День', 'en': 'Day'},
@@ -367,58 +388,63 @@ class LocaleService {
     'In progress': {'ru': 'В процессе', 'en': 'In progress'},
     'Start Training': {'ru': 'Начать тренировку', 'en': 'Start Training'},
     'Review': {'ru': 'Просмотр', 'en': 'Review'},
-    
+
     // Таймер
     'Таймер': {'ru': 'Таймер', 'en': 'Timer'},
     'осталось': {'ru': 'осталось', 'en': 'remaining'},
     'Время вышло!': {'ru': 'Время вышло!', 'en': 'Time is up!'},
-    'Таймер завершен. Нажмите "Продолжить" для перехода к следующему упражнению.': {
-      'ru': 'Таймер завершен. Нажмите "Продолжить" для перехода к следующему упражнению.',
+    'Таймер завершен. Нажмите "Продолжить" для перехода к следующему упражнению.':
+        {
+      'ru':
+          'Таймер завершен. Нажмите "Продолжить" для перехода к следующему упражнению.',
       'en': 'Timer completed. Press "Continue" to go to the next exercise.',
     },
-'Day completed!': {'ru': 'День завершен!', 'en': 'Day completed!'},
-     'Вы завершили все упражнения на сегодня. Отлично работа!': {
-       'ru': 'Вы завершили все упражнения на сегодня. Отлично работа!',
-       'en': 'You completed all exercises for today. Great work!',
-     },
-'Заблокировано': {'ru': 'Заблокировано', 'en': 'Locked'},
-      'Близко к завершению': {'ru': 'Близко к завершению', 'en': 'Almost completed'},
-      
-     // Программы
+    'Day completed!': {'ru': 'День завершен!', 'en': 'Day completed!'},
+    'Вы завершили все упражнения на сегодня. Отлично работа!': {
+      'ru': 'Вы завершили все упражнения на сегодня. Отлично работа!',
+      'en': 'You completed all exercises for today. Great work!',
+    },
+    'Заблокировано': {'ru': 'Заблокировано', 'en': 'Locked'},
+    'Близко к завершению': {
+      'ru': 'Близко к завершению',
+      'en': 'Almost completed'
+    },
+
+    // Программы
     'Программы': {'ru': 'Программы', 'en': 'Programs'},
     'дней': {'ru': 'дней', 'en': 'days'},
     'Начать программу': {'ru': 'Начать программу', 'en': 'Start program'},
-     'Программа началась!': {
-       'ru': 'Программа началась!',
-       'en': 'Program started!',
-     },
-     'Нет программ': {'ru': 'Нет программ', 'en': 'No programs'},
-     'О нас': {'ru': 'О нас', 'en': 'About Us'},
-     'about_text': {
-       'ru': 'Basketball Training — это современное мобильное приложение для баскетболистов всех уровней. Мы помогаем вам улучшать свои навыки с помощью структурированных тренировочных программ, детальных инструкций по упражнениям и персонального AI-тренера.\n\n'
-             '✨ Наши возможности:\n'
-             '• Персональные тренировочные программы на 7, 14 и 30 дней\n'
-             '• Подробное описание каждого упражнения с видео-демонстрацией\n'
-             '• Отслеживание прогресса и статистики\n'
-             '• Возможность добавлять упражнения в избранное\n'
-             '• AI-тренер для ответов на вопросы по баскетболу и тренировкам\n'
-             '• Поддержка нескольких языков\n\n'
-             '🎯 Наша миссия — сделать качественные баскетбольные тренировки доступными для каждого, где бы вы ни находились. Мы верим, что систематические занятия с правильной техникой приводят к выдающимся результатам.\n\n'
-             '📧 Связь: gluk.dan@gmail.com\n\n'
-             '© 2025 Basketball Training Team. Все права защищены.',
-       'en': 'Basketball Training is a modern mobile app for basketball players of all levels. We help you improve your skills with structured training programs, detailed exercise instructions, and a personal AI coach.\n\n'
-             '✨ Features:\n'
-             '• Personal training programs for 7, 14 and 30 days\n'
-             '• Detailed description of each exercise with video demonstration\n'
-             '• Progress and statistics tracking\n'
-             '• Ability to add exercises to favorites\n'
-             '• AI coach for basketball and training questions\n'
-             '• Multi-language support\n\n'
-             '🎯 Our mission is to make quality basketball training accessible to everyone, wherever you are. We believe that systematic training with proper technique leads to outstanding results.\n\n'
-             '📧 Contact: gluk.dan@gmail.com\n\n'
-             '© 2025 Basketball Training Team. All rights reserved.',
-     },
-     'Нажмите для просмотра тренировки': {
+    'Программа началась!': {
+      'ru': 'Программа началась!',
+      'en': 'Program started!',
+    },
+    'Нет программ': {'ru': 'Нет программ', 'en': 'No programs'},
+    'О нас': {'ru': 'О нас', 'en': 'About Us'},
+    'about_text': {
+      'ru': 'Basketball Training — это современное мобильное приложение для баскетболистов всех уровней. Мы помогаем вам улучшать свои навыки с помощью структурированных тренировочных программ, детальных инструкций по упражнениям и персонального AI-тренера.\n\n'
+          '✨ Наши возможности:\n'
+          '• Персональные тренировочные программы на 7, 14 и 30 дней\n'
+          '• Подробное описание каждого упражнения с видео-демонстрацией\n'
+          '• Отслеживание прогресса и статистики\n'
+          '• Возможность добавлять упражнения в избранное\n'
+          '• AI-тренер для ответов на вопросы по баскетболу и тренировкам\n'
+          '• Поддержка нескольких языков\n\n'
+          '🎯 Наша миссия — сделать качественные баскетбольные тренировки доступными для каждого, где бы вы ни находились. Мы верим, что систематические занятия с правильной техникой приводят к выдающимся результатам.\n\n'
+          '📧 Связь: gluk.dan@gmail.com\n\n'
+          '© 2025 Basketball Training Team. Все права защищены.',
+      'en': 'Basketball Training is a modern mobile app for basketball players of all levels. We help you improve your skills with structured training programs, detailed exercise instructions, and a personal AI coach.\n\n'
+          '✨ Features:\n'
+          '• Personal training programs for 7, 14 and 30 days\n'
+          '• Detailed description of each exercise with video demonstration\n'
+          '• Progress and statistics tracking\n'
+          '• Ability to add exercises to favorites\n'
+          '• AI coach for basketball and training questions\n'
+          '• Multi-language support\n\n'
+          '🎯 Our mission is to make quality basketball training accessible to everyone, wherever you are. We believe that systematic training with proper technique leads to outstanding results.\n\n'
+          '📧 Contact: gluk.dan@gmail.com\n\n'
+          '© 2025 Basketball Training Team. All rights reserved.',
+    },
+    'Нажмите для просмотра тренировки': {
       'ru': 'Нажмите для просмотра тренировки',
       'en': 'Tap to view workout',
     },

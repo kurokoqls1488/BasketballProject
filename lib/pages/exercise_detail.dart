@@ -207,101 +207,107 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
     final translatedName = LocaleService.translateDbData(widget.nameExercise);
     final translatedDesc = LocaleService.translateDbData(widget.description);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: Text(translatedName),
-        backgroundColor: Colors.transparent,
-        foregroundColor: const Color(0xFFFFA500),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+        ),
+        Container(color: Colors.black.withOpacity(0.3)),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(translatedName),
+            backgroundColor: const Color(0xFF1A1A1A),
+            foregroundColor: const Color(0xFFFFA500),
+            centerTitle: true,
           ),
-          Container(color: Colors.black.withOpacity(0.3)),
-          Positioned.fill(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900],
-                      border:
-                          Border.all(color: const Color(0xFFFFA500), width: 2),
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 4 / 3,
-                      child: _buildMediaContent(),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          translatedName,
-                          style: const TextStyle(
-                            color: Color(0xFFFF4500),
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[900],
+                          border: Border.all(
+                            color: const Color(0xFFFFA500),
+                            width: 2,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Container(
-                          width: double.infinity,
-                          height: 2,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xFFFFA500),
-                                const Color(0xFFDC143C).withValues(alpha: 0),
-                              ],
+                        child: AspectRatio(
+                          aspectRatio: 4 / 3,
+                          child: _buildMediaContent(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              translatedName,
+                              style: const TextStyle(
+                                color: Color(0xFFFF4500),
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          LocaleService.translate('Описание'),
-                          style: const TextStyle(
-                            color: Color(0xFFFFA500),
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          translatedDesc.isNotEmpty
-                              ? translatedDesc
-                              : LocaleService.translate(
-                                  'Описание упражнения пока недоступно',
+                            const SizedBox(height: 20),
+                            Container(
+                              width: double.infinity,
+                              height: 2,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFFFFA500),
+                                    const Color(0xFFDC143C).withValues(alpha: 0),
+                                  ],
                                 ),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            height: 1.5,
-                          ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              LocaleService.translate('Описание'),
+                              style: const TextStyle(
+                                color: Color(0xFFFFA500),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              translatedDesc.isNotEmpty
+                                  ? translatedDesc
+                                  : LocaleService.translate(
+                                      'Описание упражнения пока недоступно',
+                                    ),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 100),
+                          ],
                         ),
-                        const SizedBox(height: 100),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              Positioned(
+                bottom: 24,
+                left: 16,
+                right: 16,
+                child: _buildTimerBar(),
+              ),
+            ],
           ),
-          Positioned(
-            bottom: 24,
-            left: 16,
-            right: 16,
-            child: _buildTimerBar(),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

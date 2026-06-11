@@ -42,41 +42,53 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = authProvider.currentUser;
 
     if (user == null) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.sports_basketball,
-                color: Color(0xFFFF4500),
-                size: 60,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _t('Ошибка: Пользователь не авторизован.'),
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF4500),
-                ),
-                child: Text(
-                  _t('Войти'),
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
-        ),
+          Container(
+            color: Colors.black.withOpacity(0.3),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.sports_basketball,
+                      color: Color(0xFFFF4500),
+                      size: 60,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      _t('Ошибка: Пользователь не авторизован.'),
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4500),
+                      ),
+                      child: Text(
+                        _t('Войти'),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 

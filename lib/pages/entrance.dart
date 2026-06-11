@@ -73,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_t('Ошибка отправки кода подтверждения. Попробуйте снова.')),
+              content: Text(
+                  _t('Ошибка отправки кода подтверждения. Попробуйте снова.')),
               backgroundColor: Colors.red,
             ),
           );
@@ -251,11 +252,11 @@ class _LoginPageState extends State<LoginPage> {
                             onTap: _isSubmitting
                                 ? null
                                 : (canSubmit
-                                      ? () {
-                                          SettingsService.vibrate();
-                                          _handleLogin();
-                                        }
-                                      : null),
+                                    ? () {
+                                        SettingsService.vibrate();
+                                        _handleLogin();
+                                      }
+                                    : null),
                             child: Center(
                               child: _isSubmitting
                                   ? const CircularProgressIndicator(

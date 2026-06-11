@@ -98,17 +98,18 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
             ),
           ),
         );
-       } else {
-         // If OTP fails, log out and show error
-         await authProvider.logout();
-         if (!mounted) return;
-         ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(
-             content: Text('Ошибка отправки кода подтверждения. Попробуйте снова.'),
-             backgroundColor: Colors.red,
-           ),
-         );
-       }
+      } else {
+        // If OTP fails, log out and show error
+        await authProvider.logout();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Ошибка отправки кода подтверждения. Попробуйте снова.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -142,8 +143,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
         Positioned.fill(
           child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
         ),
-        Container(color: Colors.black.withOpacity(0.6)),
-        Scaffold(
+        Container(
+          color: Colors.black.withOpacity(0.6),
+          child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
@@ -164,11 +166,11 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
             ),
             body: Padding(
               padding: const EdgeInsets.all(30),
-                child: Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onChanged: () => setState(() {}),
-                  child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onChanged: () => setState(() {}),
+                child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -229,11 +231,13 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 1),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 1),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 2),
                             ),
                           ),
                         ),
@@ -271,11 +275,13 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 1),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 1),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 2),
                             ),
                           ),
                         ),
@@ -313,11 +319,13 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 1),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 1),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 2),
                             ),
                           ),
                         ),
@@ -355,11 +363,13 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 1),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 1),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
+                              borderSide:
+                                  const BorderSide(color: Colors.red, width: 2),
                             ),
                           ),
                         ),
@@ -416,7 +426,8 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => const PrivacyPolicyPage(),
+                                              builder: (context) =>
+                                                  const PrivacyPolicyPage(),
                                             ),
                                           );
                                         },
@@ -425,7 +436,8 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                                           style: TextStyle(
                                             color: Color(0xFFFFA500),
                                             fontWeight: FontWeight.bold,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       ),
@@ -463,11 +475,11 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                             onTap: _isSubmitting
                                 ? null
                                 : (canSubmit
-                                      ? () {
-                                          SettingsService.vibrate();
-                                          _handleRegister();
-                                        }
-                                      : null),
+                                    ? () {
+                                        SettingsService.vibrate();
+                                        _handleRegister();
+                                      }
+                                    : null),
                             child: Center(
                               child: _isSubmitting
                                   ? const CircularProgressIndicator(
@@ -495,7 +507,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-    SettingsService.vibrate();
+                              SettingsService.vibrate();
                               Navigator.pop(context);
                             },
                             child: Text(
@@ -511,9 +523,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                       ),
                     ],
                   ),
-                  ),
                 ),
               ),
+            ),
           ),
         ),
       ],

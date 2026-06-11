@@ -66,77 +66,76 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Container(color: Colors.black.withOpacity(0.3)),
         Scaffold(
-            backgroundColor: Colors.transparent,
-            body: _buildBody(),
-            bottomNavigationBar: BottomNavigationBar(
-              backgroundColor: Colors.black,
-              selectedItemColor: Color(0xFFFFA500),
-              unselectedItemColor: Colors.grey,
-              selectedLabelStyle: TextStyle(color: Color(0xFFFFA500)),
-              unselectedLabelStyle: TextStyle(color: Colors.grey),
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              items: [
-                BottomNavigationBarItem(
-                  icon: ColorFiltered(
-                    colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                    child: Image.asset('icons/ball.png', width: 40, height: 40),
-                  ),
-                  activeIcon: Image.asset(
-                    'icons/ball.png',
-                    width: 40,
-                    height: 40,
-                  ),
-                  label: _t('Главная'),
+          backgroundColor: Colors.transparent,
+          body: _buildBody(),
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: Colors.black,
+            selectedItemColor: Color(0xFFFFA500),
+            unselectedItemColor: Colors.grey,
+            selectedLabelStyle: TextStyle(color: Color(0xFFFFA500)),
+            unselectedLabelStyle: TextStyle(color: Colors.grey),
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            items: [
+              BottomNavigationBarItem(
+                icon: ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                  child: Image.asset('icons/ball.png', width: 40, height: 40),
                 ),
-                BottomNavigationBarItem(
-                  icon: ColorFiltered(
-                    colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                    child: Image.asset('icons/man.png', width: 40, height: 40),
-                  ),
-                  activeIcon: Image.asset(
-                    'icons/man.png',
-                    width: 40,
-                    height: 40,
-                  ),
-                  label: _t('Программы'),
+                activeIcon: Image.asset(
+                  'icons/ball.png',
+                  width: 40,
+                  height: 40,
                 ),
-                BottomNavigationBarItem(
-                  icon: ColorFiltered(
-                    colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                    child: Image.asset(
-                      'icons/coach.png',
-                      width: 50,
-                      height: 50,
-                    ),
-                  ),
-                  activeIcon: Image.asset(
+                label: _t('Главная'),
+              ),
+              BottomNavigationBarItem(
+                icon: ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                  child: Image.asset('icons/man.png', width: 40, height: 40),
+                ),
+                activeIcon: Image.asset(
+                  'icons/man.png',
+                  width: 40,
+                  height: 40,
+                ),
+                label: _t('Программы'),
+              ),
+              BottomNavigationBarItem(
+                icon: ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                  child: Image.asset(
                     'icons/coach.png',
                     width: 50,
                     height: 50,
                   ),
-                  label: _t('Тренер'),
                 ),
-                BottomNavigationBarItem(
-                  icon: ColorFiltered(
-                    colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                    child: Image.asset(
-                      'icons/person.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                  ),
-                  activeIcon: Image.asset(
+                activeIcon: Image.asset(
+                  'icons/coach.png',
+                  width: 50,
+                  height: 50,
+                ),
+                label: _t('Тренер'),
+              ),
+              BottomNavigationBarItem(
+                icon: ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                  child: Image.asset(
                     'icons/person.png',
                     width: 40,
                     height: 40,
                   ),
-                  label: _t('Профиль'),
                 ),
-              ],
-            ),
+                activeIcon: Image.asset(
+                  'icons/person.png',
+                  width: 40,
+                  height: 40,
+                ),
+                label: _t('Профиль'),
+              ),
+            ],
           ),
         ),
       ],
@@ -271,8 +270,8 @@ class _HomeContentState extends State<HomeContent> {
                 color: Colors.black.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
-              ),
-            ],
+          ),
+        ],
           ),
           child: SafeArea(
             bottom: false,
@@ -567,33 +566,39 @@ class _HomeContentState extends State<HomeContent> {
                     },
                   ),
                 ),
-                ..._nearbyProgram != null
-                    ? [
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              LocaleService.translate('Близко к завершению'),
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                color: Color(0xFFFFA500),
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildNearbyProgramCard(),
-                      ]
-                    : [],
+                _buildNearbyProgramSection(),
                 const SizedBox(height: 20),
               ],
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildNearbyProgramSection() {
+    if (_nearbyProgram == null) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: SizedBox(
+            width: double.infinity,
+            child: Text(
+              LocaleService.translate('Близко к завершению'),
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Color(0xFFFFA500),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildNearbyProgramCard(),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'auth_service.dart';
 
 class SettingsService {
   static const String _vibrationKey = 'vibration_enabled';
+
   static bool _vibrationEnabled = true;
 
   static bool get vibrationEnabled => _vibrationEnabled;
@@ -15,6 +16,9 @@ class SettingsService {
   static Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     _vibrationEnabled = prefs.getBool(_vibrationKey) ?? true;
+    debugPrint(
+      'Settings loaded - vibration: $_vibrationEnabled',
+    );
 
     await LocaleService.loadLanguage();
   }
