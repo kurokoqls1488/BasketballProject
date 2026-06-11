@@ -515,13 +515,9 @@ class _TrainingPageState extends State<TrainingPage> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
-        if (!SettingsService.backgroundEnabled)
-          Positioned.fill(
-            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-          ),
-        Container(color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.3) : const Color(0xFF121212)),
-          Scaffold(
+       children: [
+        Container(color: const Color(0xFF121212)),
+        Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
