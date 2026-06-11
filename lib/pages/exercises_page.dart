@@ -19,8 +19,8 @@ class Exercise {
     required String description,
     this.video,
     this.recommendedDurationSeconds,
-  })  : _nameExercise = nameExercise,
-        _description = description;
+  }) : _nameExercise = nameExercise,
+       _description = description;
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
     return Exercise(
@@ -121,8 +121,9 @@ class _ExercisesPageState extends State<ExercisesPage> {
       final response = await _authService.fetchExercises(widget.workoutId);
       if (mounted) {
         setState(() {
-          _cachedExercises =
-              response.map((json) => Exercise.fromJson(json)).toList();
+          _cachedExercises = response
+              .map((json) => Exercise.fromJson(json))
+              .toList();
           _isLoading = false;
         });
       }
@@ -265,55 +266,55 @@ class _ExercisesPageState extends State<ExercisesPage> {
                         ),
                       ),
                     ),
-                    // Сердечко (слева от фото)
-                    if (_authService.isLoggedIn)
-                      Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: IconButton(
-                          icon: Icon(
-                            _favoriteExerciseIds.contains(ex.id)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: Colors.white,
-                            size: 20,
+                     // Сердечко (слева от фото)
+                     if (_authService.isLoggedIn)
+                       Padding(
+                         padding: const EdgeInsets.all(15),
+                         child: IconButton(
+                           icon: Icon(
+                             _favoriteExerciseIds.contains(ex.id)
+                                 ? Icons.favorite
+                                 : Icons.favorite_border,
+                             color: Colors.white,
+                             size: 20,
+                           ),
+                           onPressed: () => _toggleFavoriteExercise(ex),
+                         ),
+                       ),
+                      // Фото (справа, фиксированная ширина, закругления слева because it's on the right edge)
+                      Expanded(
+                        flex: 0,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
                           ),
-                          onPressed: () => _toggleFavoriteExercise(ex),
+                          child: ex.image.isNotEmpty
+                              ? ex.image.startsWith('http')
+                                  ? Image.network(
+                                      ex.image,
+                                      fit: BoxFit.fitHeight,
+                                      errorBuilder: (c, e, s) => Image.asset(
+                                        'images/pustoe_photo.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      ex.image.startsWith('images/')
+                                          ? ex.image
+                                          : 'images/${ex.image}',
+                                      fit: BoxFit.fitHeight,
+                                      errorBuilder: (c, e, s) => Image.asset(
+                                        'images/pustoe_photo.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    )
+                              : Image.asset(
+                                  'images/pustoe_photo.png',
+                                  fit: BoxFit.fitHeight,
+                                ),
                         ),
                       ),
-                    // Фото (справа, фиксированная ширина, закругления слева because it's on the right edge)
-                    Expanded(
-                      flex: 0,
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          bottomLeft: Radius.circular(15),
-                        ),
-                        child: ex.image.isNotEmpty
-                            ? ex.image.startsWith('http')
-                                ? Image.network(
-                                    ex.image,
-                                    fit: BoxFit.fitHeight,
-                                    errorBuilder: (c, e, s) => Image.asset(
-                                      'images/pustoe_photo.png',
-                                      fit: BoxFit.fitHeight,
-                                    ),
-                                  )
-                                : Image.asset(
-                                    ex.image.startsWith('images/')
-                                        ? ex.image
-                                        : 'images/${ex.image}',
-                                    fit: BoxFit.fitHeight,
-                                    errorBuilder: (c, e, s) => Image.asset(
-                                      'images/pustoe_photo.png',
-                                      fit: BoxFit.fitHeight,
-                                    ),
-                                  )
-                            : Image.asset(
-                                'images/pustoe_photo.png',
-                                fit: BoxFit.fitHeight,
-                              ),
-                      ),
-                    ),
                   ],
                 ),
               ),

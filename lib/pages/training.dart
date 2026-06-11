@@ -64,30 +64,20 @@ class _TrainingPageState extends State<TrainingPage> {
         if (userProg != null) {
           await _authService.initializeAllProgramDays(userProg, days);
           final userProgData = await _authService.getUserProgram(userProg);
-          progressMap[programId] =
-              (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
-          completedMap[programId] =
-              userProgData?['is_completed'] as bool? ?? false;
+          progressMap[programId] = (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
+          completedMap[programId] = userProgData?['is_completed'] as bool? ?? false;
         } else {
           progressMap[programId] = 0.0;
           completedMap[programId] = false;
         }
 
-        return {
-          'program': program,
-          'days': days,
-          'progress': progressMap[programId],
-          'completed': completedMap[programId]
-        };
+        return {'program': program, 'days': days, 'progress': progressMap[programId], 'completed': completedMap[programId]};
       }).toList();
 
       final results = await Future.wait(futures);
       final filtered = results.where((r) => r != null).toList();
 
-      final allPrograms = filtered
-          .map((r) =>
-              (r as Map<String, dynamic>)['program'] as Map<String, dynamic>)
-          .toList();
+      final allPrograms = filtered.map((r) => (r as Map<String, dynamic>)['program'] as Map<String, dynamic>).toList();
       final allProgress = <int, double>{};
       final allDays = <int, List<dynamic>>{};
       final allCompleted = <int, bool>{};
@@ -120,6 +110,7 @@ class _TrainingPageState extends State<TrainingPage> {
     }
   }
 
+
   Future<void> _startProgram(int programId) async {
     SettingsService.vibrate();
     final userProgramId = await _authService.getOrCreateUserProgram(programId);
@@ -151,9 +142,7 @@ class _TrainingPageState extends State<TrainingPage> {
     }
 
     final dayNum = (currentDay ?? 1).clamp(1, days.length);
-    final dayData = days.firstWhere(
-        (d) => (d['day_number'] as int? ?? 0) == dayNum,
-        orElse: () => days[0]);
+    final dayData = days.firstWhere((d) => (d['day_number'] as int? ?? 0) == dayNum, orElse: () => days[0]);
     final workoutId = dayData['id_workout'] as int?;
 
     if (workoutId == null) {
@@ -168,22 +157,22 @@ class _TrainingPageState extends State<TrainingPage> {
       return;
     }
 
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProgramExercisePage(
-          userProgramId: userProgramId,
-          dayNumber: dayNum,
-          programId: programId,
-          workoutId: workoutId,
-          startIndex: 0,
-        ),
-      ),
-    ).then((_) {
-      // Refresh data when returning from ProgramExercisePage
-      _loadData();
-    });
+     if (!mounted) return;
+     Navigator.push(
+       context,
+       MaterialPageRoute(
+         builder: (context) => ProgramExercisePage(
+           userProgramId: userProgramId,
+           dayNumber: dayNum,
+           programId: programId,
+           workoutId: workoutId,
+           startIndex: 0,
+         ),
+       ),
+     ).then((_) {
+       // Refresh data when returning from ProgramExercisePage
+       _loadData();
+     });
   }
 
   Future<void> _continueProgram(int programId) async {
@@ -195,14 +184,11 @@ class _TrainingPageState extends State<TrainingPage> {
 
     if (progId == null || progProgramId == null) return;
 
-    final days = _programDaysCache[progProgramId] ??
-        await _authService.fetchProgramDays(progProgramId);
+    final days = _programDaysCache[progProgramId] ?? await _authService.fetchProgramDays(progProgramId);
     if (days.isEmpty || !mounted) return;
 
     final dayNumClamped = curDay.clamp(1, days.length);
-    final dayData = days.firstWhere(
-        (d) => (d['day_number'] as int? ?? 0) == dayNumClamped,
-        orElse: () => days[0]);
+    final dayData = days.firstWhere((d) => (d['day_number'] as int? ?? 0) == dayNumClamped, orElse: () => days[0]);
     final workoutId = dayData['id_workout'] as int?;
 
     if (workoutId == null) {
@@ -217,22 +203,22 @@ class _TrainingPageState extends State<TrainingPage> {
       return;
     }
 
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProgramExercisePage(
-          userProgramId: progId,
-          dayNumber: dayNumClamped,
-          programId: progProgramId,
-          workoutId: workoutId,
-          startIndex: 0,
-        ),
-      ),
-    ).then((_) {
-      // Refresh data when returning from ProgramExercisePage
-      _loadData();
-    });
+     if (!mounted) return;
+     Navigator.push(
+       context,
+       MaterialPageRoute(
+         builder: (context) => ProgramExercisePage(
+           userProgramId: progId,
+           dayNumber: dayNumClamped,
+           programId: progProgramId,
+           workoutId: workoutId,
+           startIndex: 0,
+         ),
+       ),
+     ).then((_) {
+       // Refresh data when returning from ProgramExercisePage
+       _loadData();
+     });
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program) {
@@ -265,20 +251,20 @@ class _TrainingPageState extends State<TrainingPage> {
         child: InkWell(
           onTap: () {
             SettingsService.vibrate();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProgramDaysPage(
-                  programId: programId,
-                  programName: programName,
-                  programDescription: description,
-                  programImage: image.isNotEmpty ? image : null,
-                ),
-              ),
-            ).then((_) {
-              // Refresh data when returning from ProgramDaysPage
-              _loadData();
-            });
+             Navigator.push(
+               context,
+               MaterialPageRoute(
+                 builder: (context) => ProgramDaysPage(
+                   programId: programId,
+                   programName: programName,
+                   programDescription: description,
+                   programImage: image.isNotEmpty ? image : null,
+                 ),
+               ),
+             ).then((_) {
+               // Refresh data when returning from ProgramDaysPage
+               _loadData();
+             });
           },
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -311,9 +297,7 @@ class _TrainingPageState extends State<TrainingPage> {
                                       height: 1.3,
                                     ),
                                     maxLines: isExpanded ? null : 2,
-                                    overflow: isExpanded
-                                        ? null
-                                        : TextOverflow.ellipsis,
+                                    overflow: isExpanded ? null : TextOverflow.ellipsis,
                                   )
                                 : const SizedBox(),
                             const SizedBox(height: 10),
@@ -334,23 +318,15 @@ class _TrainingPageState extends State<TrainingPage> {
                                 ),
                                 const SizedBox(width: 16),
                                 Icon(
-                                  isAllCompleted
-                                      ? Icons.check_circle
-                                      : Icons.update,
-                                  color: isAllCompleted
-                                      ? const Color(0xFF4CAF50)
-                                      : Colors.white54,
+                                  isAllCompleted ? Icons.check_circle : Icons.update,
+                                  color: isAllCompleted ? const Color(0xFF4CAF50) : Colors.white54,
                                   size: 16,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  isAllCompleted
-                                      ? _t('Completed')
-                                      : _t('In progress'),
+                                  isAllCompleted ? _t('Completed') : _t('In progress'),
                                   style: TextStyle(
-                                    color: isAllCompleted
-                                        ? const Color(0xFF4CAF50)
-                                        : Colors.white54,
+                                    color: isAllCompleted ? const Color(0xFF4CAF50) : Colors.white54,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -360,8 +336,7 @@ class _TrainingPageState extends State<TrainingPage> {
                             LinearProgressIndicator(
                               value: progress,
                               backgroundColor: Colors.grey[800],
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFFFFA500)),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFA500)),
                               minHeight: 6,
                             ),
                             const SizedBox(height: 4),
@@ -410,8 +385,7 @@ class _TrainingPageState extends State<TrainingPage> {
                             fit: BoxFit.cover,
                             width: 90,
                             height: 120,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Image.asset(
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
                               'images/pustoe_photo.png',
                               fit: BoxFit.cover,
                               width: 90,
@@ -439,26 +413,22 @@ class _TrainingPageState extends State<TrainingPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      ...days.map((day) {
-                        final dayNum = day['day_number'] as int? ?? 0;
-                        final workoutName = _t("Workout");
-                        return Container(
+                       ...days.map((day) {
+                         final dayNum = day['day_number'] as int? ?? 0;
+                         final workoutName = _t("Workout");
+                         return Container(
                           margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color:
-                                const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+                            color: const Color(0xFFFFFFFF).withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFA500)
-                                      .withValues(alpha: 0.2),
+                                  color: const Color(0xFFFFA500).withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -483,9 +453,9 @@ class _TrainingPageState extends State<TrainingPage> {
                               ),
                             ],
                           ),
-                        );
-                      }),
-                      const SizedBox(height: 12),
+                         );
+                       }),
+                       const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -494,8 +464,7 @@ class _TrainingPageState extends State<TrainingPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFFA500),
                                 foregroundColor: Colors.black,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -516,10 +485,8 @@ class _TrainingPageState extends State<TrainingPage> {
                                 onPressed: () => _continueProgram(programId),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: const Color(0xFFFFA500),
-                                  side: const BorderSide(
-                                      color: Color(0xFFFFA500)),
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
+                                  side: const BorderSide(color: Color(0xFFFFA500)),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -548,24 +515,23 @@ class _TrainingPageState extends State<TrainingPage> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+       children: [
         Positioned.fill(
           child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
         ),
         Container(color: Colors.black.withOpacity(0.3)),
         Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
             backgroundColor: Colors.transparent,
-            elevation: 0,
-            automaticallyImplyLeading:
-                false, // Убираем автоматическую стрелку назад
-            title: Text(
-              _t('Программы'),
-              style: const TextStyle(color: Color(0xFFFFA500), fontSize: 22),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading: false, // Убираем автоматическую стрелку назад
+              title: Text(
+                _t('Программы'),
+                style: const TextStyle(color: Color(0xFFFFA500), fontSize: 22),
+              ),
+              centerTitle: true,
             ),
-            centerTitle: true,
-          ),
           body: _isLoading
               ? Center(
                   child: CircularProgressIndicator(color: Color(0xFFFF4500)),
@@ -575,15 +541,13 @@ class _TrainingPageState extends State<TrainingPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline,
-                              color: Colors.red, size: 60),
+                          const Icon(Icons.error_outline, color: Colors.red, size: 60),
                           const SizedBox(height: 16),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 40),
                             child: Text(
                               '${_t('Error')}: $_error',
-                              style: const TextStyle(
-                                  color: Colors.white70, fontSize: 16),
+                              style: const TextStyle(color: Colors.white70, fontSize: 16),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -604,19 +568,16 @@ class _TrainingPageState extends State<TrainingPage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.fitness_center,
-                                  color: Colors.white54, size: 80),
+                              Icon(Icons.fitness_center, color: Colors.white54, size: 80),
                               const SizedBox(height: 20),
                               Text(
                                 _t('No programs found'),
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 18),
+                                style: const TextStyle(color: Colors.white70, fontSize: 18),
                               ),
                               const SizedBox(height: 10),
                               Text(
                                 _t('Please try again later'),
-                                style: const TextStyle(
-                                    color: Colors.white54, fontSize: 14),
+                                style: const TextStyle(color: Colors.white54, fontSize: 14),
                               ),
                             ],
                           ),
@@ -628,8 +589,7 @@ class _TrainingPageState extends State<TrainingPage> {
                             padding: const EdgeInsets.only(top: 10, bottom: 80),
                             itemCount: _programs.length,
                             itemBuilder: (context, index) {
-                              final program =
-                                  _programs[index] as Map<String, dynamic>;
+                              final program = _programs[index] as Map<String, dynamic>;
                               return _buildProgramCard(program);
                             },
                           ),

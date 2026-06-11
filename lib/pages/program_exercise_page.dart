@@ -87,8 +87,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
             _currentIndex = widget.startIndex.clamp(0, _exercises.length - 1);
             _startTimerForCurrentExercise();
             final currentExercise = _exercises[_currentIndex];
-            final exercise =
-                currentExercise['exercise'] as Map<String, dynamic>?;
+            final exercise = currentExercise['exercise'] as Map<String, dynamic>?;
             final videoUrl = exercise?['video'] as String?;
             _initializeVideo(videoUrl);
           }
@@ -104,11 +103,10 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     }
   }
 
-  void _startTimerForCurrentExercise() {
+void _startTimerForCurrentExercise() {
     _timer?.cancel();
     final currentExercise = _exercises[_currentIndex];
-    final durationSeconds =
-        currentExercise['exercise']['recommendedDurationSeconds'] as int?;
+    final durationSeconds = currentExercise['exercise']['recommendedDurationSeconds'] as int?;
     if (durationSeconds == null || durationSeconds <= 0) {
       setState(() {
         _remainingSeconds = 0;
@@ -122,7 +120,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
       _isTimerRunning = true;
       _showTimerComplete = false;
     });
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+_timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -197,8 +195,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
   void _startAddTimeLongPress() {
     _longPressTimer?.cancel();
     int increment = 30;
-    _longPressTimer =
-        Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    _longPressTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
         _remainingSeconds += increment;
         _showTimerComplete = false;
@@ -211,11 +208,9 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
   void _startSubtractTimeLongPress() {
     _longPressTimer?.cancel();
     int decrement = 30;
-    _longPressTimer =
-        Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    _longPressTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
-        _remainingSeconds =
-            (_remainingSeconds - decrement).clamp(0, 23 * 3600 + 59 * 60 + 59);
+        _remainingSeconds = (_remainingSeconds - decrement).clamp(0, 23 * 3600 + 59 * 60 + 59);
         _showTimerComplete = false;
         decrement += 5;
       });
@@ -237,8 +232,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
 
   void _subtractTime(int seconds) {
     setState(() {
-      _remainingSeconds =
-          (_remainingSeconds - seconds).clamp(0, 23 * 3600 + 59 * 60 + 59);
+      _remainingSeconds = (_remainingSeconds - seconds).clamp(0, 23 * 3600 + 59 * 60 + 59);
       _showTimerComplete = false;
     });
   }
@@ -259,8 +253,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1A1A1A),
-          title: Text(_t('Установить время'),
-              style: const TextStyle(color: Color(0xFFFFA500))),
+          title: Text(_t('Установить время'), style: const TextStyle(color: Color(0xFFFFA500))),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -302,8 +295,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(_t('Отмена'),
-                  style: const TextStyle(color: Color(0xFFFFA500))),
+              child: Text(_t('Отмена'), style: const TextStyle(color: Color(0xFFFFA500))),
             ),
             TextButton(
               onPressed: () {
@@ -313,8 +305,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                 });
                 Navigator.pop(context);
               },
-              child: Text(_t('ОК'),
-                  style: const TextStyle(color: Color(0xFFFFA500))),
+              child: Text(_t('ОК'), style: const TextStyle(color: Color(0xFFFFA500))),
             ),
           ],
         );
@@ -354,9 +345,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
               child: Text(
                 _formatDuration(Duration(seconds: _remainingSeconds)),
                 style: TextStyle(
-                  color: _showTimerComplete
-                      ? Colors.green
-                      : const Color(0xFFFFA500),
+                  color: _showTimerComplete ? Colors.green : const Color(0xFFFFA500),
                   fontSize: MediaQuery.of(context).size.width * 0.06,
                   fontWeight: FontWeight.bold,
                 ),
@@ -370,8 +359,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                 onTap: () => _subtractTime(30),
                 onLongPress: _startSubtractTimeLongPress,
                 onLongPressEnd: (_) => _stopLongPress(),
-                child: const Icon(Icons.remove,
-                    color: Color(0xFFFFA500), size: 20),
+                child: const Icon(Icons.remove, color: Color(0xFFFFA500), size: 20),
               ),
               IconButton(
                 onPressed: _toggleTimer,
@@ -386,8 +374,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                 onTap: () => _addTime(30),
                 onLongPress: _startAddTimeLongPress,
                 onLongPressEnd: (_) => _stopLongPress(),
-                child:
-                    const Icon(Icons.add, color: Color(0xFFFFA500), size: 20),
+                child: const Icon(Icons.add, color: Color(0xFFFFA500), size: 20),
               ),
             ],
           ),
@@ -557,8 +544,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
 
   double get _dayProgress {
     if (_exercises.isEmpty) return 0.0;
-    final completedCount =
-        _exercises.where((e) => e['completed'] as bool).length;
+    final completedCount = _exercises.where((e) => e['completed'] as bool).length;
     return completedCount / _exercises.length;
   }
 
@@ -568,10 +554,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     final videoUrl = exercise?['video'] as String?;
     final image = exercise?['image'] as String? ?? '';
 
-    if (videoUrl != null &&
-        videoUrl.isNotEmpty &&
-        _isVideoInitialized &&
-        _videoController != null) {
+    if (videoUrl != null && videoUrl.isNotEmpty && _isVideoInitialized && _videoController != null) {
       return Stack(
         fit: StackFit.expand,
         children: [
@@ -586,9 +569,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
             ),
           ),
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 0, left: 0, right: 0,
             child: _VideoPlayerControls(
               _videoController!,
               onToggle: _togglePlayPause,
@@ -644,8 +625,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                 child: LinearProgressIndicator(
                   value: _dayProgress,
                   backgroundColor: Colors.grey[800],
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(Color(0xFFFFA500)),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFA500)),
                   minHeight: 4,
                 ),
               ),
@@ -660,8 +640,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline,
-                              color: Colors.red, size: 60),
+                          const Icon(Icons.error_outline, color: Colors.red, size: 60),
                           const SizedBox(height: 16),
                           Text(
                             '${_t('Ошибка:')} $_error',
@@ -682,8 +661,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                       ? Center(
                           child: Text(
                             _t('Упражнения не найдены'),
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 16),
+                            style: const TextStyle(color: Colors.white70, fontSize: 16),
                           ),
                         )
                       : _buildExerciseView(),
@@ -698,9 +676,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     final rawName = (exercise['name'] as String?)?.isNotEmpty == true
         ? exercise['name'] as String
         : null;
-    final nameExercise = rawName != null
-        ? LocaleService.translateDbData(rawName)
-        : _t('Exercise');
+    final nameExercise = rawName != null ? LocaleService.translateDbData(rawName) : _t('Exercise');
     final description = exercise['description'] as String? ?? '';
     final isCompleted = currentExercise['completed'] as bool;
 
@@ -719,8 +695,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                         child: LinearProgressIndicator(
                           value: _dayProgress,
                           backgroundColor: Colors.grey[800],
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFFFFA500)),
+                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFA500)),
                           minHeight: 6,
                         ),
                       ),
@@ -740,8 +715,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    border:
-                        Border.all(color: const Color(0xFFFFA500), width: 2),
+                    border: Border.all(color: const Color(0xFFFFA500), width: 2),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(13),
@@ -821,12 +795,10 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _currentIndex > 0
-                      ? () {
-                          SettingsService.vibrate();
-                          _goToPrevious();
-                        }
-                      : null,
+                  onPressed: _currentIndex > 0 ? () {
+                    SettingsService.vibrate();
+                    _goToPrevious();
+                  } : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[800],
                     foregroundColor: Colors.white,
@@ -955,9 +927,7 @@ class _VideoPlayerControlsState extends State<_VideoPlayerControls> {
             child: Slider(
               value: controller.value.position.inMilliseconds.toDouble(),
               min: 0,
-              max: duration.inMilliseconds > 0
-                  ? duration.inMilliseconds.toDouble()
-                  : 1,
+              max: duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1,
               onChangeStart: (value) {
                 _wasPlayingBeforeDrag = controller.value.isPlaying;
                 controller.pause();

@@ -270,8 +270,7 @@ String _t(String key) => LocaleService.translate(key);
                 color: Color(0xFFFFA500),
                 strokeWidth: 2,
               ),
-            ),
-          ],
+        ],
         ),
       );
     }
