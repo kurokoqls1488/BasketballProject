@@ -32,21 +32,21 @@ class Workout {
   String get translatedName => LocaleService.translateDbData(name);
 }
 
-
 class Complex {
   final String _nameComplex;
   final int id;
   final String? image;
 
   Complex({required this.id, required String nameComplex, this.image})
-    : _nameComplex = nameComplex;
+      : _nameComplex = nameComplex;
 
   factory Complex.fromJson(Map<String, dynamic> json) {
     debugPrint('Complex.fromJson received: $json');
     final id = json['id'] ?? 0;
     final nameComplex = json['name_complex'] ?? json['name'] ?? '';
     final image = json['image'];
-    debugPrint('Complex.fromJson parsed: id=$id, name="$nameComplex", image=$image');
+    debugPrint(
+        'Complex.fromJson parsed: id=$id, name="$nameComplex", image=$image');
     return Complex(
       id: id,
       nameComplex: nameComplex,
@@ -177,7 +177,7 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
         child: InkWell(
           onTap: () {
             SettingsService.vibrate();
-              Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ExercisesPage(
@@ -211,72 +211,72 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
                           ),
                         ),
                         Row(
-                             children: [
-                               const Icon(
-                                 Icons.timer_outlined,
-                                 color: Colors.white70,
-                                 size: 18,
-                               ),
-                               const SizedBox(width: 6),
-                               Text(
-                                 "${workout.duration ?? 0} ${_t('мин.')}",
-                                 style: const TextStyle(
-                                   color: Colors.white,
-                                   fontSize: 16,
-                                   fontWeight: FontWeight.w500,
-                                 ),
-                               ),
-                                const Spacer(),
-                                if (_authService.isLoggedIn)
-                                  IconButton(
-                                    icon: Icon(
-                                      _favoriteWorkoutIds.contains(workout.id)
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => _toggleFavorite(workout),
-                                  ),
-                             ],
-                           ),
+                          children: [
+                            const Icon(
+                              Icons.timer_outlined,
+                              color: Colors.white70,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              "${workout.duration ?? 0} ${_t('мин.')}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (_authService.isLoggedIn)
+                              IconButton(
+                                icon: Icon(
+                                  _favoriteWorkoutIds.contains(workout.id)
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                onPressed: () => _toggleFavorite(workout),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
-                 Expanded(
-                   flex: 0,
-                   child: ClipRRect(
-                     borderRadius: const BorderRadius.only(
-                       topLeft: Radius.circular(15),
-                       bottomLeft: Radius.circular(15),
-                     ),
-                     child: workout.image != null && workout.image!.isNotEmpty
-                         ? (workout.image!.startsWith('http')
-                             ? Image.network(
-                                 workout.image!,
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               )
-                             : Image.asset(
-                                 workout.image!.startsWith('images/')
-                                     ? workout.image!
-                                     : 'images/${workout.image!}',
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               ))
-                         : Image.asset(
-                             'images/pustoe_photo.png',
-                             fit: BoxFit.fitHeight,
-                           ),
-                   ),
-                 ),
+                Expanded(
+                  flex: 0,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      bottomLeft: Radius.circular(15),
+                    ),
+                    child: workout.image != null && workout.image!.isNotEmpty
+                        ? (workout.image!.startsWith('http')
+                            ? Image.network(
+                                workout.image!,
+                                fit: BoxFit.fitHeight,
+                                errorBuilder: (c, e, s) => Image.asset(
+                                  'images/pustoe_photo.png',
+                                  fit: BoxFit.fitHeight,
+                                ),
+                              )
+                            : Image.asset(
+                                workout.image!.startsWith('images/')
+                                    ? workout.image!
+                                    : 'images/${workout.image!}',
+                                fit: BoxFit.fitHeight,
+                                errorBuilder: (c, e, s) => Image.asset(
+                                  'images/pustoe_photo.png',
+                                  fit: BoxFit.fitHeight,
+                                ),
+                              ))
+                        : Image.asset(
+                            'images/pustoe_photo.png',
+                            fit: BoxFit.fitHeight,
+                          ),
+                  ),
+                ),
               ],
             ),
           ),

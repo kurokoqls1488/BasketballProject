@@ -113,7 +113,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
           timerFinished = true;
         }
       });
-      
+
       if (timerFinished) {
         timer.cancel();
         SettingsService.vibrate();
@@ -144,7 +144,8 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
   void _startAddTimeLongPress() {
     _longPressTimer?.cancel();
     int increment = 30; // Начальный прирост
-    _longPressTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    _longPressTimer =
+        Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
         _remainingSeconds += increment;
         _showTimerComplete = false;
@@ -157,9 +158,11 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
   void _startSubtractTimeLongPress() {
     _longPressTimer?.cancel();
     int decrement = 30;
-    _longPressTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    _longPressTimer =
+        Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
-        _remainingSeconds = (_remainingSeconds - decrement).clamp(0, 23 * 3600 + 59 * 60 + 59);
+        _remainingSeconds =
+            (_remainingSeconds - decrement).clamp(0, 23 * 3600 + 59 * 60 + 59);
         _showTimerComplete = false;
         decrement += 5;
       });
@@ -174,7 +177,8 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
 
   void _subtractTime(int seconds) {
     setState(() {
-      _remainingSeconds = (_remainingSeconds - seconds).clamp(0, 23 * 3600 + 59 * 60 + 59);
+      _remainingSeconds =
+          (_remainingSeconds - seconds).clamp(0, 23 * 3600 + 59 * 60 + 59);
       _showTimerComplete = false;
     });
   }
@@ -226,7 +230,8 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey[900],
-                      border: Border.all(color: const Color(0xFFFFA500), width: 2),
+                      border:
+                          Border.all(color: const Color(0xFFFFA500), width: 2),
                     ),
                     child: AspectRatio(
                       aspectRatio: 4 / 3,
@@ -300,7 +305,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
     );
   }
 
-Widget _buildTimerBar() {
+  Widget _buildTimerBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -333,7 +338,9 @@ Widget _buildTimerBar() {
               child: Text(
                 _formatDuration(Duration(seconds: _remainingSeconds)),
                 style: TextStyle(
-                  color: _showTimerComplete ? Colors.green : const Color(0xFFFFA500),
+                  color: _showTimerComplete
+                      ? Colors.green
+                      : const Color(0xFFFFA500),
                   fontSize: MediaQuery.of(context).size.width * 0.06,
                   fontWeight: FontWeight.bold,
                 ),
@@ -348,7 +355,8 @@ Widget _buildTimerBar() {
                 onTap: () => _subtractTime(30),
                 onLongPress: _startSubtractTimeLongPress,
                 onLongPressEnd: (_) => _stopLongPress(),
-                child: const Icon(Icons.remove, color: Color(0xFFFFA500), size: 20),
+                child: const Icon(Icons.remove,
+                    color: Color(0xFFFFA500), size: 20),
               ),
               IconButton(
                 onPressed: _toggleTimer,
@@ -363,7 +371,8 @@ Widget _buildTimerBar() {
                 onTap: () => _addTime(30),
                 onLongPress: _startAddTimeLongPress,
                 onLongPressEnd: (_) => _stopLongPress(),
-                child: const Icon(Icons.add, color: Color(0xFFFFA500), size: 20),
+                child:
+                    const Icon(Icons.add, color: Color(0xFFFFA500), size: 20),
               ),
             ],
           ),
@@ -381,7 +390,8 @@ Widget _buildTimerBar() {
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1A1A1A),
-          title: Text(_t('Установить время'), style: const TextStyle(color: Color(0xFFFFA500))),
+          title: Text(_t('Установить время'),
+              style: const TextStyle(color: Color(0xFFFFA500))),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -423,7 +433,8 @@ Widget _buildTimerBar() {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(_t('Отмена'), style: const TextStyle(color: Color(0xFFFFA500))),
+              child: Text(_t('Отмена'),
+                  style: const TextStyle(color: Color(0xFFFFA500))),
             ),
             TextButton(
               onPressed: () {
@@ -433,7 +444,8 @@ Widget _buildTimerBar() {
                 });
                 Navigator.pop(context);
               },
-              child: Text(_t('ОК'), style: const TextStyle(color: Color(0xFFFFA500))),
+              child: Text(_t('ОК'),
+                  style: const TextStyle(color: Color(0xFFFFA500))),
             ),
           ],
         );
@@ -442,7 +454,10 @@ Widget _buildTimerBar() {
   }
 
   Widget _buildMediaContent() {
-    if (widget.video != null && widget.video!.isNotEmpty && _isVideoInitialized && _videoController != null) {
+    if (widget.video != null &&
+        widget.video!.isNotEmpty &&
+        _isVideoInitialized &&
+        _videoController != null) {
       return Stack(
         fit: StackFit.expand,
         children: [
@@ -457,7 +472,9 @@ Widget _buildTimerBar() {
             ),
           ),
           Positioned(
-            bottom: 0, left: 0, right: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
             child: _VideoPlayerControls(
               _videoController!,
               onToggle: _togglePlayPause,
@@ -472,7 +489,8 @@ Widget _buildTimerBar() {
         widget.image,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => Image.asset(
-          'images/pustoe_photo.png', fit: BoxFit.cover,
+          'images/pustoe_photo.png',
+          fit: BoxFit.cover,
         ),
       );
     }
@@ -484,7 +502,8 @@ Widget _buildTimerBar() {
         assetPath,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => Image.asset(
-          'images/pustoe_photo.png', fit: BoxFit.cover,
+          'images/pustoe_photo.png',
+          fit: BoxFit.cover,
         ),
       );
     }
@@ -561,7 +580,9 @@ class _VideoPlayerControlsState extends State<_VideoPlayerControls> {
             child: Slider(
               value: controller.value.position.inMilliseconds.toDouble(),
               min: 0,
-              max: duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1,
+              max: duration.inMilliseconds > 0
+                  ? duration.inMilliseconds.toDouble()
+                  : 1,
               onChangeStart: (value) {
                 _wasPlayingBeforeDrag = controller.value.isPlaying;
                 controller.pause();

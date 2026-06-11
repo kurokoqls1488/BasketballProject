@@ -10,7 +10,6 @@ import 'about_us_page.dart';
 import 'privacy_policy_page.dart';
 import 'settings_page.dart';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -134,20 +133,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: ClipOval(
                       child:
                           user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                          ? Image.network(
-                              user.avatarUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.sports_basketball,
-                                color: Color(0xFFFF4500),
-                                size: 50,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.sports_basketball,
-                              color: Color(0xFFFF4500),
-                              size: 50,
-                            ),
+                              ? Image.network(
+                                  user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.sports_basketball,
+                                    color: Color(0xFFFF4500),
+                                    size: 50,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.sports_basketball,
+                                  color: Color(0xFFFF4500),
+                                  size: 50,
+                                ),
                     ),
                   ),
                 ),

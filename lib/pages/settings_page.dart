@@ -128,50 +128,50 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildActionTile(
                   title: _t('Очистка кэша'),
                   icon: Icons.delete_outline,
-                   onTap: () async {
-                     final confirm = await showDialog<bool>(
-                       context: context,
-                       builder: (context) => AlertDialog(
-                         backgroundColor: const Color(0xFF1A1A1A),
-                         title: Text(
-                           _t('Очистка кэша'),
-                           style: const TextStyle(color: Colors.white),
-                         ),
-                         content: Text(
-                           LocaleService.translate('Вы уверены?'),
-                           style: const TextStyle(color: Colors.white70),
-                         ),
-                         actions: [
-                           TextButton(
-                             onPressed: () => Navigator.pop(context, false),
-                             child: Text(
-                               _t('Отмена'),
-                               style: const TextStyle(color: Colors.white54),
-                             ),
-                           ),
-                           TextButton(
-                             onPressed: () => Navigator.pop(context, true),
-                             child: Text(
-                               _t('Очистить'),
-                               style: const TextStyle(color: Color(0xFFFFA500)),
-                             ),
-                           ),
-                         ],
-                       ),
-                     );
-                     if (confirm != true) return;
-                     await SettingsService.clearCache();
-                     if (!mounted) return;
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(
-                         content: Text(
-                           LocaleService.translate('Кэш очищен'),
-                           style: const TextStyle(color: Colors.white),
-                         ),
-                         backgroundColor: const Color(0xFF1A1A1A),
-                       ),
-                     );
-                   },
+                  onTap: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: const Color(0xFF1A1A1A),
+                        title: Text(
+                          _t('Очистка кэша'),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        content: Text(
+                          LocaleService.translate('Вы уверены?'),
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              _t('Отмена'),
+                              style: const TextStyle(color: Colors.white54),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              _t('Очистить'),
+                              style: const TextStyle(color: Color(0xFFFFA500)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm != true) return;
+                    await SettingsService.clearCache();
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          LocaleService.translate('Кэш очищен'),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: const Color(0xFF1A1A1A),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 30),
                 Text(

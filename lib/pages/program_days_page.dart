@@ -47,7 +47,8 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
       });
 
       final days = await _authService.fetchProgramDays(widget.programId);
-      final userProgramId = await _authService.getOrCreateUserProgram(widget.programId);
+      final userProgramId =
+          await _authService.getOrCreateUserProgram(widget.programId);
 
       List<DayWithWorkout> dayList = [];
       for (final day in days) {
@@ -63,13 +64,17 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
       Map<int, double> progressMap = {};
       if (userProgramId != null) {
         final userProg = await _authService.getUserProgram(userProgramId);
-        completionMap = await _authService.fetchDayCompletionStatuses(userProgramId);
-        final dayProgress = userProg?['day_progress'] as Map<String, dynamic>? ?? {};
+        completionMap =
+            await _authService.fetchDayCompletionStatuses(userProgramId);
+        final dayProgress =
+            userProg?['day_progress'] as Map<String, dynamic>? ?? {};
         for (final day in days) {
           final dayNum = day['day_number'] as int? ?? 0;
           if (dayNum > 0) {
-            final dayStats = dayProgress[dayNum.toString()] as Map<String, dynamic>?;
-            progressMap[dayNum] = ((dayStats?['percent'] as num?)?.toDouble() ?? 0.0) / 100.0;
+            final dayStats =
+                dayProgress[dayNum.toString()] as Map<String, dynamic>?;
+            progressMap[dayNum] =
+                ((dayStats?['percent'] as num?)?.toDouble() ?? 0.0) / 100.0;
           }
         }
       }
@@ -180,7 +185,8 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                               LinearProgressIndicator(
                                 value: progress,
                                 backgroundColor: Colors.grey[800],
-                                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFA500)),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Color(0xFFFFA500)),
                                 minHeight: 6,
                               ),
                               const SizedBox(height: 6),
@@ -196,15 +202,29 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                                   ),
                                   const SizedBox(width: 12),
                                   Icon(
-                                    isCompleted ? Icons.check_circle : Icons.update,
-                                    color: isCompleted ? const Color(0xFF4CAF50) : (progress > 0 ? Color(0xFFFFA500) : Colors.white54),
+                                    isCompleted
+                                        ? Icons.check_circle
+                                        : Icons.update,
+                                    color: isCompleted
+                                        ? const Color(0xFF4CAF50)
+                                        : (progress > 0
+                                            ? Color(0xFFFFA500)
+                                            : Colors.white54),
                                     size: 16,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    isCompleted ? _t('Completed') : (progress > 0 ? _t('In progress') : _t('Not started')),
+                                    isCompleted
+                                        ? _t('Completed')
+                                        : (progress > 0
+                                            ? _t('In progress')
+                                            : _t('Not started')),
                                     style: TextStyle(
-                                      color: isCompleted ? const Color(0xFF4CAF50) : (progress > 0 ? Colors.white70 : Colors.white54),
+                                      color: isCompleted
+                                          ? const Color(0xFF4CAF50)
+                                          : (progress > 0
+                                              ? Colors.white70
+                                              : Colors.white54),
                                       fontSize: 13,
                                     ),
                                   ),
@@ -217,7 +237,8 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                       if (!isCompleted)
                         const Padding(
                           padding: EdgeInsets.only(right: 15),
-                          child: Icon(Icons.arrow_forward, color: Color(0xFFFFA500), size: 24),
+                          child: Icon(Icons.arrow_forward,
+                              color: Color(0xFFFFA500), size: 24),
                         ),
                     ],
                   ),
@@ -256,7 +277,8 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                     ),
                     const Padding(
                       padding: EdgeInsets.only(right: 15),
-                      child: Icon(Icons.lock_outline, color: Colors.grey, size: 24),
+                      child: Icon(Icons.lock_outline,
+                          color: Colors.grey, size: 24),
                     ),
                   ],
                 ),
@@ -298,13 +320,15 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                          const Icon(Icons.error_outline,
+                              color: Colors.red, size: 60),
                           const SizedBox(height: 16),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 40),
                             child: Text(
                               '${_t('Error')}: $_error',
-                              style: const TextStyle(color: Colors.white70, fontSize: 16),
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 16),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -323,7 +347,8 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                       ? Center(
                           child: Text(
                             _t('No days found'),
-                            style: const TextStyle(color: Colors.white70, fontSize: 16),
+                            style: const TextStyle(
+                                color: Colors.white70, fontSize: 16),
                           ),
                         )
                       : ListView.builder(
@@ -331,7 +356,9 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
                           itemCount: _days.length,
                           itemBuilder: (context, index) {
                             final day = _days[index];
-                            final isCompleted = _dayCompletionStatus[day.programDay.dayNumber] ?? false;
+                            final isCompleted = _dayCompletionStatus[
+                                    day.programDay.dayNumber] ??
+                                false;
                             return _buildDayCard(day, isCompleted);
                           },
                         ),
