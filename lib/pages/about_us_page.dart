@@ -32,9 +32,11 @@ class _AboutUsPageState extends State<AboutUsPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          color: const Color(0xFF121212),
-          child: Scaffold(
+        Positioned.fill(
+          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+        ),
+        Container(color: Colors.black.withOpacity(0.6)),
+        Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               backgroundColor: Colors.transparent,

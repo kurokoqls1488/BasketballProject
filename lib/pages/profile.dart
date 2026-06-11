@@ -83,7 +83,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Stack(
       children: [
-        Container(color: const Color(0xFF121212)),
+        Positioned.fill(
+          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+        ),
+        Container(color: Colors.black.withOpacity(0.6)),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(

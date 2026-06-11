@@ -89,9 +89,11 @@ String _t(String key) => LocaleService.translate(key);
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-        Container(
-          color: const Color(0xFF121212),
-          child: SafeArea(
+        Positioned.fill(
+          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+        ),
+        Container(color: Colors.black.withOpacity(0.5)),
+        SafeArea(
               child: Column(
                 children: [
                   _buildHeader(),
