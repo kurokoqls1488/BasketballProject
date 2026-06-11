@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/locale_service.dart';
+import '../services/settings_service.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
   const PrivacyPolicyPage({super.key});
@@ -31,29 +32,31 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-        ),
-        Container(color: Colors.black.withOpacity(0.6)),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              _t('Политика конфиденциальности'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-            centerTitle: true,
+        if (!SettingsService.backgroundEnabled)
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
+        Container(
+          color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : const Color(0xFF121212),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                _t('Политика конфиденциальности'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              centerTitle: true,
+            ),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(30),

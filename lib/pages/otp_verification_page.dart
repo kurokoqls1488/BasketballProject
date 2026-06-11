@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
 import '../services/locale_service.dart';
+import '../services/settings_service.dart';
 import 'start_screen.dart';
 
 class OTPVerificationPage extends StatefulWidget {
@@ -128,29 +129,31 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-        ),
-        Container(color: Colors.black.withOpacity(0.6)),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              widget.isRegistration ? _t('Подтверждение email') : _t('Вход'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-            centerTitle: true,
+        if (!SettingsService.backgroundEnabled)
+          Positioned.fill(
+            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
           ),
+        Container(
+          color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.6) : const Color(0xFF121212),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                widget.isRegistration ? _t('Подтверждение email') : _t('Вход'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              centerTitle: true,
+            ),
           body: Padding(
             padding: const EdgeInsets.all(30),
             child: Form(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/ai_service.dart';
 import '../services/locale_service.dart';
+import '../services/settings_service.dart';
 
 class CoachPage extends StatefulWidget {
   const CoachPage({super.key});
@@ -88,12 +89,14 @@ class _CoachPageState extends State<CoachPage> {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
-          ),
-          Container(color: Colors.black.withOpacity(0.5)),
-          SafeArea(
-            child: Column(
+          if (!SettingsService.backgroundEnabled)
+            Positioned.fill(
+              child: Image.asset('images/basketball_fon.jpg', fit: BoxFit.cover),
+            ),
+          Container(
+            color: !SettingsService.backgroundEnabled ? Colors.black.withOpacity(0.5) : const Color(0xFF121212),
+            child: SafeArea(
+              child: Column(
               children: [
                 _buildHeader(),
                 Expanded(
