@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/settings_service.dart';
 import '../services/locale_service.dart';
 
@@ -183,19 +184,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                _buildActionTile(
-                  title: _t('Связаться с нами'),
-                  icon: Icons.email_outlined,
-                  onTap: () {},
-                ),
+                 _buildActionTile(
+                   title: _t('Связаться с нами'),
+                   icon: Icons.email_outlined,
+                   onTap: () async {
+                     final Uri emailUri = Uri.parse('mailto:gluk.dan@gmail.com');
+                     if (await canLaunchUrl(emailUri)) {
+                       await launchUrl(emailUri);
+                     }
+                   },
+                 ),
                 _buildActionTile(
                   title: _t('Оценить приложение'),
                   icon: Icons.star_outline,
-                  onTap: () {},
-                ),
-                _buildActionTile(
-                  title: _t('Поделиться приложением'),
-                  icon: Icons.share_outlined,
                   onTap: () {},
                 ),
                 const SizedBox(height: 30),
