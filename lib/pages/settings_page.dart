@@ -184,16 +184,30 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                 _buildActionTile(
-                   title: _t('Связаться с нами'),
-                   icon: Icons.email_outlined,
-                   onTap: () async {
-                     final Uri emailUri = Uri.parse('mailto:gluk.dan@gmail.com');
-                     if (await canLaunchUrl(emailUri)) {
-                       await launchUrl(emailUri);
-                     }
-                   },
-                 ),
+                _buildActionTile(
+                  title: _t('Связаться с нами'),
+                  icon: Icons.email_outlined,
+                  onTap: () async {
+                    final Uri emailUri = Uri(
+                      scheme: 'mailto',
+                      path: 'gluk.dan@gmail.com',
+                    );
+                    if (await canLaunchUrl(emailUri)) {
+                      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+                    } else {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            LocaleService.translate('Не удалось открыть почтовое приложение'),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: const Color(0xFF1A1A1A),
+                        ),
+                      );
+                    }
+                  },
+                ),
                 _buildActionTile(
                   title: _t('Оценить приложение'),
                   icon: Icons.star_outline,
