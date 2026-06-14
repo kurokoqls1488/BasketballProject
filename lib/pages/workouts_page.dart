@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/locale_service.dart';
@@ -100,32 +101,19 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
   Future<void> _loadWorkouts() async {
     try {
       final response = await _authService.fetchWorkouts(widget.complex.id);
-      _favoriteWorkoutIds = {};
-      for (final json in response) {
-        final workoutId = json['id'] as int;
-        if (await _authService.isWorkoutFavorite(workoutId)) {
-          _favoriteWorkoutIds.add(workoutId);
-        }
-      }
+      final favoriteIds = await _authService.fetchFavoriteWorkoutIds();
+      _favoriteWorkoutIds = favoriteIds;
 
-      // Загружаем первое упражнение для каждой тренировки
-      final List<Workout> workoutsWithImages = [];
-      for (final json in response) {
+      final List<Workout> workoutsWithImages = response.map((json) {
         final workoutId = json['id'] as int;
-        // Получаем упражнения этой тренировки
-        final exercises = await _authService.fetchExercises(workoutId);
-        String? firstImage;
-        if (exercises.isNotEmpty) {
-          firstImage = exercises.first['image'] as String?;
-        }
-        workoutsWithImages.add(Workout(
+        return Workout(
           id: workoutId,
           name: json['name_workout'] ?? json['name'] ?? '',
           duration: json['duration'],
           complexId: json['id_complex'] ?? json['complex_id'],
-          image: firstImage,
-        ));
-      }
+          image: json['image'] as String?,
+        );
+      }).toList();
 
       if (mounted) {
         setState(() {
@@ -155,6 +143,44 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  Widget _buildWorkoutImage(String? image) {
+    final resolvedImage = _authService.getValidImagePath(
+      image,
+      fallbackImagePath: widget.complex.image,
+    );
+
+    if (resolvedImage != null && resolvedImage.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: resolvedImage,
+        fit: BoxFit.fitHeight,
+        placeholder: (context, url) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+        errorWidget: (context, url, error) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+      );
+    }
+
+    if (resolvedImage != null && resolvedImage.isNotEmpty) {
+      return Image.asset(
+        resolvedImage,
+        fit: BoxFit.fitHeight,
+        errorBuilder: (c, e, s) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+      );
+    }
+
+    return Image.asset(
+      'images/pustoe_photo.png',
+      fit: BoxFit.fitHeight,
+    );
   }
 
   Widget _buildWorkoutCard(Workout workout) {
@@ -244,39 +270,16 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
                     ),
                   ),
                 ),
-                 Expanded(
-                   flex: 0,
-                   child: ClipRRect(
-                     borderRadius: const BorderRadius.only(
-                       topLeft: Radius.circular(15),
-                       bottomLeft: Radius.circular(15),
+                   Expanded(
+                     flex: 0,
+                     child: ClipRRect(
+                       borderRadius: const BorderRadius.only(
+                         topLeft: Radius.circular(15),
+                         bottomLeft: Radius.circular(15),
+                       ),
+                       child: _buildWorkoutImage(workout.image),
                      ),
-                     child: workout.image != null && workout.image!.isNotEmpty
-                         ? (workout.image!.startsWith('http')
-                             ? Image.network(
-                                 workout.image!,
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               )
-                             : Image.asset(
-                                 workout.image!.startsWith('images/')
-                                     ? workout.image!
-                                     : 'images/${workout.image!}',
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               ))
-                         : Image.asset(
-                             'images/pustoe_photo.png',
-                             fit: BoxFit.fitHeight,
-                           ),
                    ),
-                 ),
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../services/auth_service.dart';
@@ -35,7 +36,11 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
   Timer? _timer;
   bool _isTimerRunning = false;
   VideoPlayerController? _videoController;
+  VideoPlayerController? _nextVideoController;
+  String? _currentVideoPath;
+  String? _nextVideoPath;
   bool _isVideoInitialized = false;
+  bool _isPreloadingNextVideo = false;
   bool _showTimerComplete = false;
   Timer? _longPressTimer;
 
@@ -52,20 +57,13 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
     _timer?.cancel();
     _videoController?.removeListener(_onVideoUpdate);
     _videoController?.dispose();
+    _nextVideoController?.removeListener(_onVideoUpdate);
+    _nextVideoController?.dispose();
     _longPressTimer?.cancel();
     super.dispose();
   }
 
   Future<void> _initializeAndLoad() async {
-    try {
-      await _authService.initializeDayExercises(
-        widget.userProgramId,
-        widget.dayNumber,
-        widget.workoutId,
-      );
-    } catch (e) {
-      debugPrint('Error initializing day exercises: $e');
-    }
     await _loadExercises();
   }
 
@@ -78,6 +76,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
       final exercises = await _authService.fetchDayExercises(
         widget.userProgramId,
         widget.dayNumber,
+        workoutId: widget.workoutId,
       );
       if (mounted) {
         setState(() {
@@ -405,93 +404,114 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
     }
   }
 
-  Future<void> _initializeVideo(String? videoPath) async {
-    await _videoController?.dispose();
-    _videoController = null;
-    _isVideoInitialized = false;
+  VideoPlayerController _createVideoController(String path) {
+    return path.startsWith('http')
+        ? VideoPlayerController.networkUrl(Uri.parse(path))
+        : VideoPlayerController.asset(path);
+  }
 
-    if (videoPath == null || videoPath.isEmpty) {
+  Future<void> _preloadNextVideo() async {
+    if (_isPreloadingNextVideo || _currentIndex >= _exercises.length - 1) return;
+
+    final targetIndex = _currentIndex + 1;
+    final nextExercise = _exercises[targetIndex]['exercise'] as Map<String, dynamic>?;
+    final nextVideoPath = _authService.resolveVideoPath(nextExercise?['video'] as String?);
+    if (nextVideoPath == null || nextVideoPath == _nextVideoPath) return;
+
+    _isPreloadingNextVideo = true;
+    final controller = _createVideoController(nextVideoPath);
+    controller.addListener(_onVideoUpdate);
+    try {
+      await controller.initialize();
+      controller.setLooping(true);
+      controller.setPlaybackSpeed(1.0);
+      if (controller.value.isPlaying) {
+        await controller.pause();
+      }
+      if (!mounted || targetIndex != _currentIndex + 1) {
+        controller.removeListener(_onVideoUpdate);
+        await controller.dispose();
+        return;
+      }
+      _nextVideoController?.removeListener(_onVideoUpdate);
+      if (_nextVideoController != null) {
+        await _nextVideoController!.dispose();
+      }
+      _nextVideoController = controller;
+      _nextVideoPath = nextVideoPath;
+    } catch (e) {
+      debugPrint('Error preloading video: $e');
+      controller.removeListener(_onVideoUpdate);
+      await controller.dispose();
+    } finally {
+      _isPreloadingNextVideo = false;
+    }
+  }
+
+  Future<void> _initializeVideo(String? videoPath, {bool shouldPlay = true}) async {
+    final resolvedVideoPath = _authService.resolveVideoPath(videoPath);
+    if (resolvedVideoPath == null) {
+      _videoController?.removeListener(_onVideoUpdate);
+      if (_videoController != null) {
+        await _videoController!.dispose();
+      }
+      _videoController = null;
+      _currentVideoPath = null;
+      _isVideoInitialized = false;
       return;
     }
 
-    try {
-      String path;
-      if (videoPath.startsWith('videos/')) {
-        path = videoPath;
-      } else {
-        path = 'videos/$videoPath';
+    if (_nextVideoController != null && resolvedVideoPath == _nextVideoPath) {
+      _videoController?.removeListener(_onVideoUpdate);
+      if (_videoController != null) {
+        await _videoController!.dispose();
       }
+      _videoController = _nextVideoController;
+      _currentVideoPath = _nextVideoPath;
+      _nextVideoController = null;
+      _nextVideoPath = null;
+      _isVideoInitialized = true;
+      if (shouldPlay && !_videoController!.value.isPlaying) {
+        await _videoController!.play();
+      }
+      if (mounted) setState(() {});
+      await _preloadNextVideo();
+      return;
+    }
 
-      _videoController = VideoPlayerController.asset(path);
+    if (_currentVideoPath == resolvedVideoPath && _videoController != null && _isVideoInitialized) {
+      if (shouldPlay && !_videoController!.value.isPlaying) {
+        await _videoController!.play();
+      }
+      return;
+    }
+
+    _videoController?.removeListener(_onVideoUpdate);
+    if (_videoController != null) {
+      await _videoController!.dispose();
+    }
+    _videoController = null;
+    _currentVideoPath = null;
+    _isVideoInitialized = false;
+
+    try {
+      _videoController = _createVideoController(resolvedVideoPath);
+      _currentVideoPath = resolvedVideoPath;
+      _videoController!.addListener(_onVideoUpdate);
       await _videoController!.initialize();
       _videoController!.setLooping(true);
-      _videoController!.setPlaybackSpeed(0.5);
-      _videoController!.addListener(_onVideoUpdate);
-      await _videoController!.play();
+      _videoController!.setPlaybackSpeed(1.0);
+      if (shouldPlay) {
+        await _videoController!.play();
+      }
+      _isVideoInitialized = true;
 
       if (mounted) {
-        setState(() {
-          _isVideoInitialized = true;
-        });
+        setState(() {});
       }
+      await _preloadNextVideo();
     } catch (e) {
       debugPrint('Error loading video: $e');
-    }
-  }
-
-  void _onVideoUpdate() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  void _togglePlayPause() {
-    if (_videoController == null) return;
-    setState(() {
-      if (_videoController!.value.isPlaying) {
-        _videoController!.pause();
-        _pauseTimer();
-      } else {
-        _videoController!.play();
-        _resumeTimer();
-      }
-    });
-  }
-
-  bool _isVideoPlaying() {
-    return _videoController != null && _videoController!.value.isPlaying;
-  }
-
-  Future<void> _goToNext() async {
-    if (_currentIndex < _exercises.length - 1) {
-      _timer?.cancel();
-      setState(() {
-        _currentIndex++;
-      });
-      _startTimerForCurrentExercise();
-      final currentExercise = _exercises[_currentIndex];
-      final exercise = currentExercise['exercise'] as Map<String, dynamic>?;
-      final videoUrl = exercise?['video'] as String?;
-      _initializeVideo(videoUrl);
-    } else {
-      await _completeDay();
-      _timer?.cancel();
-      setState(() {
-        _isTimerRunning = false;
-      });
-    }
-  }
-
-  Future<void> _goToPrevious() async {
-    if (_currentIndex > 0) {
-      _timer?.cancel();
-      setState(() {
-        _currentIndex--;
-      });
-      _startTimerForCurrentExercise();
-      final currentExercise = _exercises[_currentIndex];
-      final exercise = currentExercise['exercise'] as Map<String, dynamic>?;
-      final videoUrl = exercise?['video'] as String?;
-      _initializeVideo(videoUrl);
     }
   }
 
@@ -542,6 +562,58 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
     );
   }
 
+  void _onVideoUpdate() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _togglePlayPause() {
+    if (_videoController == null) return;
+    setState(() {
+      if (_videoController!.value.isPlaying) {
+        _videoController!.pause();
+        _pauseTimer();
+      } else {
+        _videoController!.play();
+        _resumeTimer();
+      }
+    });
+  }
+
+  Future<void> _goToNext() async {
+    if (_currentIndex < _exercises.length - 1) {
+      _timer?.cancel();
+      setState(() {
+        _currentIndex++;
+      });
+      _startTimerForCurrentExercise();
+      final currentExercise = _exercises[_currentIndex];
+      final exercise = currentExercise['exercise'] as Map<String, dynamic>?;
+      final videoUrl = exercise?['video'] as String?;
+      _initializeVideo(videoUrl);
+    } else {
+      await _completeDay();
+      _timer?.cancel();
+      setState(() {
+        _isTimerRunning = false;
+      });
+    }
+  }
+
+  Future<void> _goToPrevious() async {
+    if (_currentIndex > 0) {
+      _timer?.cancel();
+      setState(() {
+        _currentIndex--;
+      });
+      _startTimerForCurrentExercise();
+      final currentExercise = _exercises[_currentIndex];
+      final exercise = currentExercise['exercise'] as Map<String, dynamic>?;
+      final videoUrl = exercise?['video'] as String?;
+      _initializeVideo(videoUrl);
+    }
+  }
+
   double get _dayProgress {
     if (_exercises.isEmpty) return 0.0;
     final completedCount = _exercises.where((e) => e['completed'] as bool).length;
@@ -579,20 +651,28 @@ _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       );
     }
 
-    if (image.startsWith('http')) {
-      return Image.network(
-        _authService.getImageUrl(image),
+    final resolvedImage = _authService.getValidImagePath(
+      image,
+      fallbackImagePath: 'images/pustoe_photo.png',
+    );
+
+    if (resolvedImage != null && resolvedImage.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: resolvedImage,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Image.asset(
+        placeholder: (context, url) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.cover,
+        ),
+        errorWidget: (context, error, stackTrace) => Image.asset(
           'images/pustoe_photo.png',
           fit: BoxFit.cover,
         ),
       );
     }
-    if (image.isNotEmpty) {
-      final assetPath = image.startsWith('images/') ? image : 'images/$image';
+    if (resolvedImage != null && resolvedImage.isNotEmpty) {
       return Image.asset(
-        assetPath,
+        resolvedImage,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => Image.asset(
           'images/pustoe_photo.png',
@@ -875,7 +955,7 @@ class _VideoPlayerControlsState extends State<_VideoPlayerControls> {
   @override
   void initState() {
     super.initState();
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
       if (mounted) setState(() {});
     });
   }
