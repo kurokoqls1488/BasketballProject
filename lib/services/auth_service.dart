@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:async';
 
 class AuthService {
   static final Map<int, List<dynamic>> _workoutsCache = {};
@@ -139,9 +140,8 @@ class AuthService {
       final response = await supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
-      );
-      // Если вход успешен - выходим, чтобы не создавать сессию
-      await supabaseClient.auth.signOut();
+      ).timeout(const Duration(seconds: 30));
+      await supabaseClient.auth.signOut().timeout(const Duration(seconds: 10));
       return response.user != null;
     } catch (e) {
       return false;
@@ -154,12 +154,12 @@ class AuthService {
         await supabaseClient.auth.signInWithOtp(
           email: email,
           shouldCreateUser: true,
-        );
+        ).timeout(const Duration(seconds: 30));
       } else {
         await supabaseClient.auth.signInWithOtp(
           email: email,
           shouldCreateUser: false,
-        );
+        ).timeout(const Duration(seconds: 30));
       }
       return true;
     } catch (e) {
@@ -174,14 +174,15 @@ class AuthService {
         email: email,
         token: otp,
         type: OtpType.email,
-      );
+      ).timeout(const Duration(seconds: 30));
       final user = response.user;
       if (user != null) {
         final userDataResponse = await supabaseClient
             .from('users')
-            .select()
+            .select('id,nickname')
             .eq('id', user.id)
-            .maybeSingle();
+            .maybeSingle()
+            .timeout(const Duration(seconds: 10));
         return userDataResponse;
       }
       return null;
@@ -197,17 +198,18 @@ class AuthService {
         email: email,
         token: otp,
         type: OtpType.signup,
-      );
+      ).timeout(const Duration(seconds: 30));
       final user = response.user;
       if (user != null) {
         await supabaseClient.auth.updateUser(
           UserAttributes(data: {'nickname': nickname}),
-        );
+        ).timeout(const Duration(seconds: 15));
         final userDataResponse = await supabaseClient
             .from('users')
-            .select()
+            .select('id,nickname')
             .eq('id', user.id)
-            .maybeSingle();
+            .maybeSingle()
+            .timeout(const Duration(seconds: 10));
         return userDataResponse;
       }
       return null;
@@ -222,14 +224,15 @@ class AuthService {
       final response = await supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
-      );
+      ).timeout(const Duration(seconds: 30));
       final user = response.user;
       if (user != null) {
         final userDataResponse = await supabaseClient
             .from('users')
-            .select()
+            .select('id,nickname')
             .eq('id', user.id)
-            .maybeSingle();
+            .maybeSingle()
+            .timeout(const Duration(seconds: 10));
         return userDataResponse;
       }
       return null;
@@ -245,14 +248,15 @@ class AuthService {
         email: email,
         password: password,
         data: {'nickname': nickname},
-      );
+      ).timeout(const Duration(seconds: 30));
       final user = response.user;
       if (user != null) {
         final userDataResponse = await supabaseClient
             .from('users')
-            .select()
+            .select('id,nickname')
             .eq('id', user.id)
-            .maybeSingle();
+            .maybeSingle()
+            .timeout(const Duration(seconds: 10));
         return userDataResponse;
       }
       return null;
@@ -263,67 +267,78 @@ class AuthService {
   }
 
   Future<List<dynamic>> fetchComplexes() async {
-    debugPrint('=== fetchComplexes START ===');
-    final response = await supabaseClient
-        .from('complexes')
-        .select()
-        .order('id', ascending: true);
-    final data = response.toList();
-    _complexesCache = data;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('cached_complexes', jsonEncode(data));
-    return data;
+    if (_complexesCache != null) return _complexesCache!;
+    try {
+      final response = await supabaseClient
+          .from('complexes')
+          .select('id,name')
+          .order('id', ascending: true);
+      final data = response.toList();
+      _complexesCache = data;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_complexes', jsonEncode(data));
+      return data;
+    } catch (e) {
+      return _complexesCache ?? [];
+    }
   }
 
   Future<List<dynamic>> fetchWorkoutsWithImages(int complexId) async {
     await initCache();
     if (_workoutsCache.containsKey(complexId)) return List<dynamic>.from(_workoutsCache[complexId]!);
 
-    final response = await supabaseClient
-        .from('workouts')
-        .select()
-        .eq('id_complex', complexId);
-    final workouts = response.toList();
-    _workoutsCache[complexId] = workouts;
-    await _saveWorkoutsCache();
+    try {
+      final response = await supabaseClient
+          .from('workouts')
+          .select('id,id_complex,name')
+          .eq('id_complex', complexId)
+          .timeout(const Duration(seconds: 30));
+      final workouts = response.toList();
+      _workoutsCache[complexId] = workouts;
+      await _saveWorkoutsCache();
 
-    final workoutIds = workouts.map((w) => w['id'] as int).toList();
-    if (workoutIds.isEmpty) return workouts;
+      final workoutIds = workouts.map((w) => w['id'] as int).toList();
+      if (workoutIds.isEmpty) return workouts;
 
-    final linksResponse = await supabaseClient
-        .from('workouts_exercises')
-        .select('id_workout, id_exercise')
-        .inFilter('id_workout', workoutIds)
-        .order('id', ascending: true);
-    final links = linksResponse.toList();
+      final linksResponse = await supabaseClient
+          .from('workouts_exercises')
+          .select('id_workout,id_exercise')
+          .inFilter('id_workout', workoutIds)
+          .order('id', ascending: true)
+          .timeout(const Duration(seconds: 30));
+      final links = linksResponse.toList();
 
-    final exerciseIds = links.map((l) => l['id_exercise'] as int).toSet().toList();
-    final exercisesMap = <int, Map<String, dynamic>>{};
-    if (exerciseIds.isNotEmpty) {
-      final exercisesResponse = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
-      for (final ex in exercisesResponse) {
-        exercisesMap[ex['id'] as int] = ex;
+      final exerciseIds = links.map((l) => l['id_exercise'] as int).toSet().toList();
+      final exercisesMap = <int, Map<String, dynamic>>{};
+      if (exerciseIds.isNotEmpty) {
+        final exercisesResponse = await supabaseClient.from('exercises').select('id,image').inFilter('id', exerciseIds).timeout(const Duration(seconds: 30));
+        for (final ex in exercisesResponse) {
+          exercisesMap[ex['id'] as int] = ex;
+        }
       }
+
+      final firstExercisePerWorkout = <int, Map<String, dynamic>>{};
+      for (final link in links) {
+        final wid = link['id_workout'] as int;
+        final eid = link['id_exercise'] as int;
+        if (!firstExercisePerWorkout.containsKey(wid) && exercisesMap.containsKey(eid)) {
+          firstExercisePerWorkout[wid] = exercisesMap[eid]!;
+        }
+      }
+
+      return workouts.map((w) {
+        final wid = w['id'] as int;
+        final firstEx = firstExercisePerWorkout[wid];
+        final result = Map<String, dynamic>.from(w);
+        if (firstEx != null) {
+          result['image'] = firstEx['image'] ?? '';
+        }
+        return result;
+      }).toList();
+    } catch (e) {
+      debugPrint('Error fetchWorkoutsWithImages: $e');
+      return _workoutsCache[complexId] ?? [];
     }
-
-    final firstExercisePerWorkout = <int, Map<String, dynamic>>{};
-    for (final link in links) {
-      final wid = link['id_workout'] as int;
-      final eid = link['id_exercise'] as int;
-      if (!firstExercisePerWorkout.containsKey(wid) && exercisesMap.containsKey(eid)) {
-        firstExercisePerWorkout[wid] = exercisesMap[eid]!;
-      }
-    }
-
-    return workouts.map((w) {
-      final wid = w['id'] as int;
-      final firstEx = firstExercisePerWorkout[wid];
-      final result = Map<String, dynamic>.from(w);
-      if (firstEx != null) {
-        result['image'] = firstEx['image'] ?? '';
-      }
-      return result;
-    }).toList();
   }
 
   Future<List<dynamic>> fetchWorkouts(int complexId) async {
@@ -336,20 +351,25 @@ class AuthService {
     if (_exercisesCache.containsKey(workoutId)) {
       return _exercisesCache[workoutId]!;
     }
-    final workoutExercisesResponse = await supabaseClient
-        .from('workouts_exercises')
-        .select('id_exercise')
-        .eq('id_workout', workoutId);
-    final exerciseLinks = workoutExercisesResponse.toList();
-    if (exerciseLinks.isNotEmpty) {
-      final exerciseIds = exerciseLinks.map((item) => item['id_exercise']).toList();
-      final response = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
-      final data = response.toList();
-      _exercisesCache[workoutId] = data;
-      await _saveExercisesCache();
-      return data;
+    try {
+      final workoutExercisesResponse = await supabaseClient
+          .from('workouts_exercises')
+          .select('id_exercise')
+          .eq('id_workout', workoutId)
+          .timeout(const Duration(seconds: 15));
+      final exerciseLinks = workoutExercisesResponse.toList();
+      if (exerciseLinks.isNotEmpty) {
+        final exerciseIds = exerciseLinks.map((item) => item['id_exercise']).toList();
+        final response = await supabaseClient.from('exercises').select('id,name_exercise,image,video,description,recommended_duration_seconds').inFilter('id', exerciseIds).timeout(const Duration(seconds: 15));
+        final data = response.toList();
+        _exercisesCache[workoutId] = data;
+        await _saveExercisesCache();
+        return data;
+      }
+      return [];
+    } catch (e) {
+      return _exercisesCache[workoutId] ?? [];
     }
-    return [];
   }
 
   String getImageUrl(String imagePath) {
@@ -364,7 +384,7 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return false;
     try {
-      final response = await supabaseClient.from('favorites_workouts').select().eq('id_user', userId).eq('id_workout', workoutId).maybeSingle();
+      final response = await supabaseClient.from('favorites_workouts').select('id').eq('id_user', userId).eq('id_workout', workoutId).maybeSingle().timeout(const Duration(seconds: 10));
       final isFavorite = response != null;
       _favoritesCache[workoutId] = isFavorite;
       return isFavorite;
@@ -403,11 +423,11 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return [];
     try {
-      final response = await supabaseClient.from('favorites_workouts').select('id_workout').eq('id_user', userId).gt('id_workout', 0);
+      final response = await supabaseClient.from('favorites_workouts').select('id_workout').eq('id_user', userId).gt('id_workout', 0).timeout(const Duration(seconds: 15));
       final data = response.toList();
       if (data.isNotEmpty) {
         final workoutIds = data.map((item) => item['id_workout']).toList();
-        final workoutsResponse = await supabaseClient.from('workouts').select().inFilter('id', workoutIds);
+        final workoutsResponse = await supabaseClient.from('workouts').select('id,name,id_complex').inFilter('id', workoutIds).timeout(const Duration(seconds: 15));
         return workoutsResponse.toList();
       }
       return [];
@@ -422,7 +442,7 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return false;
     try {
-      final response = await supabaseClient.from('favorites_exercises').select().eq('id_user', userId).eq('id_exercise', exerciseId).maybeSingle();
+      final response = await supabaseClient.from('favorites_exercises').select('id').eq('id_user', userId).eq('id_exercise', exerciseId).maybeSingle().timeout(const Duration(seconds: 10));
       final isFavorite = response != null;
       _exerciseFavoritesCache[exerciseId] = isFavorite;
       return isFavorite;
@@ -435,13 +455,13 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return false;
     try {
-      final existing = await supabaseClient.from('favorites_exercises').select('id').eq('id_user', userId).eq('id_exercise', exerciseId).maybeSingle();
+      final existing = await supabaseClient.from('favorites_exercises').select('id').eq('id_user', userId).eq('id_exercise', exerciseId).maybeSingle().timeout(const Duration(seconds: 10));
       if (existing != null) {
         _exerciseFavoritesCache[exerciseId] = true;
         await _saveExerciseFavoritesCache();
         return true;
       }
-      await supabaseClient.from('favorites_exercises').insert({'id_user': userId, 'id_exercise': exerciseId});
+      await supabaseClient.from('favorites_exercises').insert({'id_user': userId, 'id_exercise': exerciseId}).timeout(const Duration(seconds: 10));
       _exerciseFavoritesCache[exerciseId] = true;
       await _saveExerciseFavoritesCache();
       return true;
@@ -454,7 +474,7 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return false;
     try {
-      await supabaseClient.from('favorites_exercises').delete().eq('id_user', userId).eq('id_exercise', exerciseId);
+      await supabaseClient.from('favorites_exercises').delete().eq('id_user', userId).eq('id_exercise', exerciseId).timeout(const Duration(seconds: 10));
       _exerciseFavoritesCache[exerciseId] = false;
       await _saveExerciseFavoritesCache();
       return true;
@@ -467,11 +487,11 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return [];
     try {
-      final response = await supabaseClient.from('favorites_exercises').select('id_exercise').eq('id_user', userId).gt('id_exercise', 0);
+      final response = await supabaseClient.from('favorites_exercises').select('id_exercise').eq('id_user', userId).gt('id_exercise', 0).timeout(const Duration(seconds: 15));
       final data = response.toList();
       if (data.isNotEmpty) {
         final exerciseIds = data.map((item) => item['id_exercise']).toList();
-        final exercisesResponse = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
+        final exercisesResponse = await supabaseClient.from('exercises').select('id,name_exercise,image,video,description,recommended_duration_seconds').inFilter('id', exerciseIds).timeout(const Duration(seconds: 15));
         return exercisesResponse.toList();
       }
       return [];
@@ -483,7 +503,7 @@ class AuthService {
   // ==================== PROGRAMS ====================
   Future<List<dynamic>> fetchPrograms() async {
     try {
-      final response = await supabaseClient.from('programs').select();
+      final response = await supabaseClient.from('programs').select('id,name,description').timeout(const Duration(seconds: 30));
       return response.toList();
     } catch (e) {
       return [];
@@ -492,28 +512,28 @@ class AuthService {
 
   Future<List<dynamic>> fetchProgramDays(int programId) async {
     try {
-      final response = await supabaseClient.from('program_days').select().eq('id_program', programId).order('day_number', ascending: true);
+      final response = await supabaseClient.from('program_days').select('id,id_program,day_number,id_workout').eq('id_program', programId).order('day_number', ascending: true).timeout(const Duration(seconds: 15));
       return response.toList();
     } catch (e) {
       return [];
     }
   }
 
-  // ==================== USER PROGRAMS ====================
+// ==================== USER PROGRAMS ====================
   Future<int?> startProgram(int programId) async {
     final userId = getCurrentUserId();
     if (userId == null) return null;
     try {
-      final response = await supabaseClient.from('user_programs').insert({'id_user': userId, 'id_program': programId, 'current_day': 1, 'is_active': true}).select('id').maybeSingle();
+      final response = await supabaseClient.from('user_programs').insert({'id_user': userId, 'id_program': programId, 'current_day': 1, 'is_active': true}).select('id').maybeSingle().timeout(const Duration(seconds: 15));
       return response?['id'] as int?;
     } catch (e) {
-    try {
-      final active = await supabaseClient.from('user_programs').select('id').eq('id_user', userId).eq('id_program', programId).eq('is_active', true).maybeSingle();
-      return active?['id'] as int?;
-    } catch (e) {
-      debugPrint('Error getOrCreateUserProgram: $e');
-      return null;
-    }
+      try {
+        final active = await supabaseClient.from('user_programs').select('id').eq('id_user', userId).eq('id_program', programId).eq('is_active', true).maybeSingle().timeout(const Duration(seconds: 10));
+        return active?['id'] as int?;
+      } catch (e) {
+        debugPrint('Error getOrCreateUserProgram: $e');
+        return null;
+      }
     }
   }
 
@@ -521,7 +541,7 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return null;
     try {
-      final active = await supabaseClient.from('user_programs').select('id').eq('id_user', userId).eq('id_program', programId).eq('is_active', true).maybeSingle();
+      final active = await supabaseClient.from('user_programs').select('id').eq('id_user', userId).eq('id_program', programId).eq('is_active', true).maybeSingle().timeout(const Duration(seconds: 10));
       if (active != null) return active['id'] as int?;
     } catch (e) {
       debugPrint('Error getOrCreateUserProgram: $e');
@@ -531,7 +551,7 @@ class AuthService {
 
   Future<int?> getCurrentDay(int userProgramId) async {
     try {
-      final response = await supabaseClient.from('user_programs').select('current_day').eq('id', userProgramId).single();
+      final response = await supabaseClient.from('user_programs').select('current_day').eq('id', userProgramId).single().timeout(const Duration(seconds: 10));
       return response['current_day'] as int?;
     } catch (e) {
       return null;
@@ -540,7 +560,7 @@ class AuthService {
 
   Future<bool> setCurrentDay(int userProgramId, int day) async {
     try {
-      await supabaseClient.from('user_programs').update({'current_day': day}).eq('id', userProgramId);
+      await supabaseClient.from('user_programs').update({'current_day': day}).eq('id', userProgramId).timeout(const Duration(seconds: 10));
       return true;
     } catch (e) {
       return false;
@@ -551,7 +571,8 @@ class AuthService {
     final userId = getCurrentUserId();
     if (userId == null) return null;
     try {
-      return await supabaseClient.from('user_programs').select().eq('id_user', userId).eq('is_active', true).maybeSingle();
+      final response = await supabaseClient.from('user_programs').select('id,id_user,id_program,current_day,progress_percent,is_completed,day_progress').eq('id_user', userId).eq('is_active', true).maybeSingle().timeout(const Duration(seconds: 15));
+      return response;
     } catch (e) {
       return null;
     }
@@ -568,9 +589,10 @@ class AuthService {
     try {
       final response = await supabaseClient
           .from('user_programs')
-          .select('progress_percent, is_completed, day_progress')
+          .select('progress_percent,is_completed,day_progress,current_day')
           .eq('id', userProgramId)
-          .maybeSingle();
+          .maybeSingle()
+          .timeout(const Duration(seconds: 15));
       return response;
     } catch (e) {
       return null;
@@ -589,9 +611,9 @@ class AuthService {
   Future<void> initializeDayExercises(int userProgramId, int dayNumber, int workoutId) async {
     await initCache();
     try {
-      final existing = await supabaseClient.from('user_program_exercise_progress').select('id').eq('id_user_program', userProgramId).eq('day_number', dayNumber).limit(1);
+      final existing = await supabaseClient.from('user_program_exercise_progress').select('id').eq('id_user_program', userProgramId).eq('day_number', dayNumber).limit(1).timeout(const Duration(seconds: 10));
       if (existing.isNotEmpty) return;
-      final workoutExercisesResponse = await supabaseClient.from('workouts_exercises').select('id_exercise').eq('id_workout', workoutId).order('id', ascending: true);
+      final workoutExercisesResponse = await supabaseClient.from('workouts_exercises').select('id_exercise').eq('id_workout', workoutId).order('id', ascending: true).timeout(const Duration(seconds: 10));
       final links = workoutExercisesResponse.toList();
       if (links.isEmpty) {
         await supabaseClient.from('user_program_exercise_progress').insert({'id_user_program': userProgramId, 'day_number': dayNumber, 'exercise_id': -1, 'exercise_order': 1, 'completed': false, 'started_at': null, 'completed_at': null});
@@ -633,7 +655,7 @@ class AuthService {
   Future<List<dynamic>> fetchDayExercises(int userProgramId, int dayNumber) async {
     await initCache();
     try {
-      final progressResponse = await supabaseClient.from('user_program_exercise_progress').select().eq('id_user_program', userProgramId).eq('day_number', dayNumber).order('exercise_order', ascending: true);
+      final progressResponse = await supabaseClient.from('user_program_exercise_progress').select('id,id_user_program,day_number,exercise_id,exercise_order,completed,completed_at,started_at').eq('id_user_program', userProgramId).eq('day_number', dayNumber).order('exercise_order', ascending: true).timeout(const Duration(seconds: 15));
       final progressData = progressResponse.toList();
       if (progressData.isEmpty) return [];
 
@@ -641,7 +663,7 @@ class AuthService {
 
       final exercisesMap = <int, Map<String, dynamic>>{};
       if (exerciseIds.isNotEmpty) {
-        final exercisesResponse = await supabaseClient.from('exercises').select().inFilter('id', exerciseIds);
+        final exercisesResponse = await supabaseClient.from('exercises').select('id,name_exercise,image,video,description,recommended_duration_seconds').inFilter('id', exerciseIds).timeout(const Duration(seconds: 15));
         for (final ex in exercisesResponse) {
           exercisesMap[ex['id'] as int] = ex;
         }
@@ -665,7 +687,7 @@ class AuthService {
 
   Future<void> markExerciseCompleted(int progressId) async {
     try {
-      await supabaseClient.from('user_program_exercise_progress').update({'completed': true, 'completed_at': DateTime.now().toIso8601String()}).eq('id', progressId);
+      await supabaseClient.from('user_program_exercise_progress').update({'completed': true, 'completed_at': DateTime.now().toIso8601String()}).eq('id', progressId).timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('Error marking exercise completed: $e');
     }
@@ -673,7 +695,7 @@ class AuthService {
 
   Future<void> markExerciseIncomplete(int progressId) async {
     try {
-      await supabaseClient.from('user_program_exercise_progress').update({'completed': false, 'completed_at': null}).eq('id', progressId);
+      await supabaseClient.from('user_program_exercise_progress').update({'completed': false, 'completed_at': null}).eq('id', progressId).timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('Error marking exercise incomplete: $e');
     }
@@ -681,7 +703,7 @@ class AuthService {
 
   Future<int?> getNextIncompleteExerciseOrder(int userProgramId, int dayNumber) async {
     try {
-      final response = await supabaseClient.from('user_program_exercise_progress').select('exercise_order').eq('id_user_program', userProgramId).eq('day_number', dayNumber).eq('completed', false).order('exercise_order', ascending: true).limit(1);
+      final response = await supabaseClient.from('user_program_exercise_progress').select('exercise_order').eq('id_user_program', userProgramId).eq('day_number', dayNumber).eq('completed', false).order('exercise_order', ascending: true).limit(1).timeout(const Duration(seconds: 10));
       final data = response.toList();
       return data.isNotEmpty ? data.first['exercise_order'] as int : null;
     } catch (e) {
@@ -697,17 +719,16 @@ class AuthService {
   Future<bool> completeDay(int userProgramId, int dayNumber) async {
     try {
       if (!await isDayCompleted(userProgramId, dayNumber)) return false;
-      final currentRecord = await supabaseClient.from('user_programs').select('current_day').eq('id', userProgramId).single();
+      final currentRecord = await supabaseClient.from('user_programs').select('current_day').eq('id', userProgramId).single().timeout(const Duration(seconds: 10));
       final currentDay = currentRecord['current_day'] as int? ?? 1;
       final newCurrentDay = dayNumber + 1 > currentDay ? dayNumber + 1 : currentDay;
-      await supabaseClient.from('user_programs').update({'current_day': newCurrentDay}).eq('id', userProgramId);
+      await supabaseClient.from('user_programs').update({'current_day': newCurrentDay}).eq('id', userProgramId).timeout(const Duration(seconds: 10));
       return true;
     } catch (e) {
       return false;
     }
   }
 
-  // Процент выполнения дня (использует кэшированные данные day_progress)
   Future<double> getDayProgressPercent(int userProgramId, int dayNumber) async {
     final userProg = await getUserProgram(userProgramId);
     final dayProgress = userProg?['day_progress'] as Map<String, dynamic>? ?? {};
