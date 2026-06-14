@@ -57,15 +57,6 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
   }
 
   Future<void> _initializeAndLoad() async {
-    try {
-      await _authService.initializeDayExercises(
-        widget.userProgramId,
-        widget.dayNumber,
-        widget.workoutId,
-      );
-    } catch (e) {
-      debugPrint('Error initializing day exercises: $e');
-    }
     await _loadExercises();
   }
 
@@ -78,6 +69,7 @@ class _ProgramExercisePageState extends State<ProgramExercisePage> {
       final exercises = await _authService.fetchDayExercises(
         widget.userProgramId,
         widget.dayNumber,
+        workoutId: widget.workoutId,
       );
       if (mounted) {
         setState(() {

@@ -57,7 +57,11 @@ class _DayDetailPageState extends State<DayDetailPage> {
         return;
       }
 
-      final exercises = await _authService.fetchDayExercises(userProgram, widget.dayNumber);
+      final exercises = await _authService.fetchDayExercises(
+        userProgram,
+        widget.dayNumber,
+        workoutId: widget.workoutId,
+      );
 
       if (mounted) {
         setState(() {

@@ -100,32 +100,19 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
   Future<void> _loadWorkouts() async {
     try {
       final response = await _authService.fetchWorkouts(widget.complex.id);
-      _favoriteWorkoutIds = {};
-      for (final json in response) {
-        final workoutId = json['id'] as int;
-        if (await _authService.isWorkoutFavorite(workoutId)) {
-          _favoriteWorkoutIds.add(workoutId);
-        }
-      }
+      final favoriteIds = await _authService.fetchFavoriteWorkoutIds();
+      _favoriteWorkoutIds = favoriteIds;
 
-      // Загружаем первое упражнение для каждой тренировки
-      final List<Workout> workoutsWithImages = [];
-      for (final json in response) {
+      final List<Workout> workoutsWithImages = response.map((json) {
         final workoutId = json['id'] as int;
-        // Получаем упражнения этой тренировки
-        final exercises = await _authService.fetchExercises(workoutId);
-        String? firstImage;
-        if (exercises.isNotEmpty) {
-          firstImage = exercises.first['image'] as String?;
-        }
-        workoutsWithImages.add(Workout(
+        return Workout(
           id: workoutId,
           name: json['name_workout'] ?? json['name'] ?? '',
           duration: json['duration'],
           complexId: json['id_complex'] ?? json['complex_id'],
-          image: firstImage,
-        ));
-      }
+          image: json['image'] as String?,
+        );
+      }).toList();
 
       if (mounted) {
         setState(() {

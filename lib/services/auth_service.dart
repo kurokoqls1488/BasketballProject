@@ -8,7 +8,10 @@ class AuthService {
   static final Map<int, List<dynamic>> _exercisesCache = {};
   static final Map<int, bool> _favoritesCache = {};
   static final Map<int, bool> _exerciseFavoritesCache = {};
-  static List<dynamic>? _complexesCache;
+  static List<Map<String, dynamic>>? _programsProgressCache;
+  static DateTime? _programsProgressCacheTime;
+  static final Map<int, List<dynamic>> _programDaysCache = {};
+  static final Map<int, Map<String, dynamic>?> _userProgramCache = {};
   static bool _cacheInitialized = false;
 
   static Future<void> initCache() async {
@@ -34,14 +37,6 @@ class AuthService {
         }
       } catch (e) {
         debugPrint('Error loading exercises cache: $e');
-      }
-    }
-    final complexesJson = prefs.getString('cached_complexes');
-    if (complexesJson != null) {
-      try {
-        _complexesCache = jsonDecode(complexesJson) as List<dynamic>;
-      } catch (e) {
-        debugPrint('Error loading complexes cache: $e');
       }
     }
     final favoritesJson = prefs.getString('cached_favorites');
@@ -114,12 +109,17 @@ class AuthService {
     _workoutsCache.clear();
     _exercisesCache.clear();
     _favoritesCache.clear();
-    _complexesCache = null;
+    _exerciseFavoritesCache.clear();
+    _programsProgressCache = null;
+    _programsProgressCacheTime = null;
+    _programDaysCache.clear();
+    _userProgramCache.clear();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cached_workouts');
     await prefs.remove('cached_exercises');
     await prefs.remove('cached_complexes');
     await prefs.remove('cached_favorites');
+    await prefs.remove('cached_exercise_favorites');
     _cacheInitialized = false;
     debugPrint('AuthService caches cleared');
   }
@@ -269,7 +269,6 @@ class AuthService {
         .select()
         .order('id', ascending: true);
     final data = response.toList();
-    _complexesCache = data;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('cached_complexes', jsonEncode(data));
     return data;
@@ -416,6 +415,22 @@ class AuthService {
     }
   }
 
+  Future<Set<int>> fetchFavoriteWorkoutIds() async {
+    final userId = getCurrentUserId();
+    if (userId == null) return {};
+    try {
+      final response = await supabaseClient.from('favorites_workouts').select('id_workout').eq('id_user', userId).gt('id_workout', 0);
+      return response
+          .toList()
+          .map((item) => item['id_workout'] as int?)
+          .where((id) => id != null)
+          .cast<int>()
+          .toSet();
+    } catch (e) {
+      return {};
+    }
+  }
+
   Future<bool> isExerciseFavorite(int exerciseId) async {
     await initCache();
     if (_exerciseFavoritesCache.containsKey(exerciseId)) return _exerciseFavoritesCache[exerciseId]!;
@@ -491,12 +506,183 @@ class AuthService {
   }
 
   Future<List<dynamic>> fetchProgramDays(int programId) async {
+    await initCache();
+    if (_programDaysCache.containsKey(programId)) {
+      return List<dynamic>.from(_programDaysCache[programId]!);
+    }
+
     try {
       final response = await supabaseClient.from('program_days').select().eq('id_program', programId).order('day_number', ascending: true);
+      final data = response.toList();
+      _programDaysCache[programId] = data;
+      return data;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> fetchProgramDaysForPrograms(List<int> programIds) async {
+    if (programIds.isEmpty) return [];
+
+    try {
+      final response = await supabaseClient
+          .from('program_days')
+          .select()
+          .inFilter('id_program', programIds)
+          .order('id_program', ascending: true);
       return response.toList();
     } catch (e) {
       return [];
     }
+  }
+
+  Future<List<dynamic>> fetchWorkoutsByIds(List<int> workoutIds) async {
+    if (workoutIds.isEmpty) return [];
+
+    try {
+      final response = await supabaseClient
+          .from('workouts')
+          .select('id, name_workout, duration')
+          .inFilter('id', workoutIds);
+      return response.toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchProgramDaysWithWorkouts(int programId) async {
+    final days = await fetchProgramDays(programId);
+    final workoutIds = days
+        .map((day) => day['id_workout'] as int?)
+        .where((id) => id != null)
+        .cast<int>()
+        .where((id) => id > 0)
+        .toList();
+
+    if (workoutIds.isEmpty) {
+      return days.map((day) => Map<String, dynamic>.from(day)).toList();
+    }
+
+    final workouts = await fetchWorkoutsByIds(workoutIds);
+    final workoutsById = <int, Map<String, dynamic>>{};
+    for (final workout in workouts) {
+      final workoutId = workout['id'] as int?;
+      if (workoutId != null) {
+        workoutsById[workoutId] = workout;
+      }
+    }
+
+    return days.map((day) {
+      final result = Map<String, dynamic>.from(day);
+      final workoutId = result['id_workout'] as int?;
+      final workout = workoutId != null ? workoutsById[workoutId] : null;
+      result['workout_name'] = workout?['name_workout'] ?? 'Workout';
+      result['workout_duration'] = workout?['duration'];
+      return result;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchUserProgramsForPrograms(List<int> programIds) async {
+    final userId = getCurrentUserId();
+    if (userId == null || programIds.isEmpty) return [];
+
+    try {
+      final response = await supabaseClient
+          .from('user_programs')
+          .select('id, id_program, current_day, progress_percent, is_completed, day_progress')
+          .eq('id_user', userId)
+          .eq('is_active', true)
+          .inFilter('id_program', programIds);
+      return response.toList().cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('Error fetching user programs: $e');
+      return [];
+    }
+  }
+
+  void _invalidateProgramProgressCache({int? userProgramId}) {
+    _programsProgressCache = null;
+    _programsProgressCacheTime = null;
+    _programDaysCache.clear();
+    if (userProgramId != null) {
+      _userProgramCache.remove(userProgramId);
+    } else {
+      _userProgramCache.clear();
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchProgramsWithProgress({bool forceRefresh = false}) async {
+    await initCache();
+    final now = DateTime.now();
+    if (!forceRefresh &&
+        _programsProgressCache != null &&
+        _programsProgressCacheTime != null &&
+        now.difference(_programsProgressCacheTime!) < const Duration(minutes: 5)) {
+      return _programsProgressCache!.map((item) => Map<String, dynamic>.from(item)).toList();
+    }
+
+    final programs = await fetchPrograms();
+    final programIds = programs
+        .map((program) => program['id'] as int?)
+        .where((id) => id != null)
+        .cast<int>()
+        .where((id) => id > 0)
+        .toList();
+
+    if (programIds.isEmpty) return [];
+
+    final userPrograms = await fetchUserProgramsForPrograms(programIds);
+    final userProgramByProgramId = <int, Map<String, dynamic>>{};
+    for (final userProgram in userPrograms) {
+      final programId = userProgram['id_program'] as int?;
+      if (programId != null) {
+        userProgramByProgramId[programId] = userProgram;
+      }
+    }
+
+    for (final programId in programIds) {
+      if (!userProgramByProgramId.containsKey(programId)) {
+        final createdUserProgramId = await startProgram(programId);
+        if (createdUserProgramId != null) {
+          final createdUserProgram = await getUserProgram(createdUserProgramId);
+          if (createdUserProgram != null) {
+            createdUserProgram['id'] = createdUserProgramId;
+            userProgramByProgramId[programId] = createdUserProgram;
+          }
+        }
+      }
+    }
+
+    final daysByProgramId = <int, List<dynamic>>{};
+    final allDays = await fetchProgramDaysForPrograms(programIds);
+    for (final day in allDays) {
+      final programId = day['id_program'] as int?;
+      if (programId != null) {
+        daysByProgramId.putIfAbsent(programId, () => []).add(day);
+      }
+    }
+
+    final result = <Map<String, dynamic>>[];
+    for (final program in programs) {
+      final programId = program['id'] as int? ?? 0;
+      if (programId <= 0) continue;
+
+      final userProgram = userProgramByProgramId[programId];
+      final progressPercent = userProgram?['progress_percent'] as int? ?? 0;
+      final programCopy = Map<String, dynamic>.from(program);
+      programCopy['user_program_id'] = userProgram?['id'] as int?;
+      programCopy['current_day'] = userProgram?['current_day'] as int? ?? 1;
+      programCopy['progress_percent'] = progressPercent;
+      programCopy['progress'] = (progressPercent.clamp(0, 100) / 100.0).toDouble();
+      programCopy['is_completed'] = userProgram?['is_completed'] as bool? ?? false;
+      programCopy['day_progress'] = userProgram?['day_progress'];
+      programCopy['days'] = daysByProgramId[programId] ?? [];
+      result.add(programCopy);
+    }
+
+    _programsProgressCache = result.map((item) => Map<String, dynamic>.from(item)).toList();
+    _programsProgressCacheTime = now;
+    return result;
   }
 
   // ==================== USER PROGRAMS ====================
@@ -505,6 +691,7 @@ class AuthService {
     if (userId == null) return null;
     try {
       final response = await supabaseClient.from('user_programs').insert({'id_user': userId, 'id_program': programId, 'current_day': 1, 'is_active': true}).select('id').maybeSingle();
+      _invalidateProgramProgressCache();
       return response?['id'] as int?;
     } catch (e) {
     try {
@@ -565,14 +752,20 @@ class AuthService {
   // Получение записи программы с кэшированными полями
   Future<Map<String, dynamic>?> getUserProgram(int userProgramId) async {
     await initCache();
+    if (_userProgramCache.containsKey(userProgramId)) {
+      return _userProgramCache[userProgramId];
+    }
+
     try {
       final response = await supabaseClient
           .from('user_programs')
           .select('progress_percent, is_completed, day_progress')
           .eq('id', userProgramId)
           .maybeSingle();
+      _userProgramCache[userProgramId] = response;
       return response;
     } catch (e) {
+      _userProgramCache[userProgramId] = null;
       return null;
     }
   }
@@ -581,8 +774,13 @@ class AuthService {
   Future<Map<int, bool>> fetchDayCompletionStatuses(int userProgramId) async {
     final userProg = await getUserProgram(userProgramId);
     final dayProgress = userProg?['day_progress'] as Map<String, dynamic>? ?? {};
-    return dayProgress.map((key, value) => 
-        MapEntry(int.parse(key), value['is_completed'] as bool));
+    final result = <int, bool>{};
+    dayProgress.forEach((key, value) {
+      final parsedKey = int.tryParse(key);
+      if (parsedKey == null || value is! Map) return;
+      result[parsedKey] = value['is_completed'] as bool? ?? false;
+    });
+    return result;
   }
 
   // ==================== DAY EXERCISES PROGRESS ====================
@@ -630,11 +828,18 @@ class AuthService {
     }
   }
 
-  Future<List<dynamic>> fetchDayExercises(int userProgramId, int dayNumber) async {
+  Future<List<dynamic>> fetchDayExercises(int userProgramId, int dayNumber, {int? workoutId}) async {
     await initCache();
     try {
       final progressResponse = await supabaseClient.from('user_program_exercise_progress').select().eq('id_user_program', userProgramId).eq('day_number', dayNumber).order('exercise_order', ascending: true);
-      final progressData = progressResponse.toList();
+      var progressData = progressResponse.toList();
+
+      if (progressData.isEmpty && workoutId != null && workoutId > 0) {
+        await initializeDayExercises(userProgramId, dayNumber, workoutId);
+        final retryResponse = await supabaseClient.from('user_program_exercise_progress').select().eq('id_user_program', userProgramId).eq('day_number', dayNumber).order('exercise_order', ascending: true);
+        progressData = retryResponse.toList();
+      }
+
       if (progressData.isEmpty) return [];
 
       final exerciseIds = progressData.map((row) => row['exercise_id']).where((id) => id != null && id != -1).toList();
@@ -666,6 +871,7 @@ class AuthService {
   Future<void> markExerciseCompleted(int progressId) async {
     try {
       await supabaseClient.from('user_program_exercise_progress').update({'completed': true, 'completed_at': DateTime.now().toIso8601String()}).eq('id', progressId);
+      _invalidateProgramProgressCache();
     } catch (e) {
       debugPrint('Error marking exercise completed: $e');
     }
@@ -674,6 +880,7 @@ class AuthService {
   Future<void> markExerciseIncomplete(int progressId) async {
     try {
       await supabaseClient.from('user_program_exercise_progress').update({'completed': false, 'completed_at': null}).eq('id', progressId);
+      _invalidateProgramProgressCache();
     } catch (e) {
       debugPrint('Error marking exercise incomplete: $e');
     }
@@ -701,6 +908,7 @@ class AuthService {
       final currentDay = currentRecord['current_day'] as int? ?? 1;
       final newCurrentDay = dayNumber + 1 > currentDay ? dayNumber + 1 : currentDay;
       await supabaseClient.from('user_programs').update({'current_day': newCurrentDay}).eq('id', userProgramId);
+      _invalidateProgramProgressCache(userProgramId: userProgramId);
       return true;
     } catch (e) {
       return false;
@@ -712,6 +920,6 @@ class AuthService {
     final userProg = await getUserProgram(userProgramId);
     final dayProgress = userProg?['day_progress'] as Map<String, dynamic>? ?? {};
     final dayStats = dayProgress[dayNumber.toString()] as Map<String, dynamic>?;
-    return (dayStats?['percent'] as num?)?.toDouble() ?? 0.0;
+    return ((dayStats?['percent'] as num?)?.toDouble() ?? 0.0) / 100.0;
   }
 }

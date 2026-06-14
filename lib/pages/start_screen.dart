@@ -170,24 +170,13 @@ class _HomeContentState extends State<HomeContent> {
 
     try {
       await AuthService.initCache();
-      final programs = await _authService.fetchPrograms();
+      final programs = await _authService.fetchProgramsWithProgress(forceRefresh: true);
       Map<String, dynamic>? closestProgram;
       double maxProgress = 0.0;
 
       for (final program in programs) {
-        final programId = program['id'] as int? ?? 0;
-        if (programId <= 0) continue;
-
-        final userProg = await _authService.getOrCreateUserProgram(programId);
-        if (userProg == null) continue;
-
-        final days = await _authService.fetchProgramDays(programId);
-        await _authService.initializeAllProgramDays(userProg, days);
-
-        final userProgData = await _authService.getUserProgram(userProg);
-        final progress =
-            (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
-        final isCompleted = userProgData?['is_completed'] as bool? ?? false;
+        final progress = (program['progress_percent'] as int? ?? 0) / 100.0;
+        final isCompleted = program['is_completed'] as bool? ?? false;
 
         if (!isCompleted && progress > maxProgress) {
           maxProgress = progress;

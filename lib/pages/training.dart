@@ -50,44 +50,21 @@ class _TrainingPageState extends State<TrainingPage> {
   Future<void> _loadData() async {
     try {
       await AuthService.initCache();
-      final programs = await _authService.fetchPrograms();
+      final programs = await _authService.fetchProgramsWithProgress(forceRefresh: true);
 
-      final futures = programs.map((program) async {
-        final programId = program['id'] as int? ?? 0;
-        if (programId <= 0) return null;
-
-        final userProg = await _authService.getOrCreateUserProgram(programId);
-        final days = await _authService.fetchProgramDays(programId);
-        Map<int, double> progressMap = {};
-        Map<int, bool> completedMap = {};
-
-        if (userProg != null) {
-          await _authService.initializeAllProgramDays(userProg, days);
-          final userProgData = await _authService.getUserProgram(userProg);
-          progressMap[programId] = (userProgData?['progress_percent'] as int? ?? 0) / 100.0;
-          completedMap[programId] = userProgData?['is_completed'] as bool? ?? false;
-        } else {
-          progressMap[programId] = 0.0;
-          completedMap[programId] = false;
-        }
-
-        return {'program': program, 'days': days, 'progress': progressMap[programId], 'completed': completedMap[programId]};
-      }).toList();
-
-      final results = await Future.wait(futures);
-      final filtered = results.where((r) => r != null).toList();
-
-      final allPrograms = filtered.map((r) => (r as Map<String, dynamic>)['program'] as Map<String, dynamic>).toList();
+      final allPrograms = <Map<String, dynamic>>[];
       final allProgress = <int, double>{};
       final allDays = <int, List<dynamic>>{};
       final allCompleted = <int, bool>{};
 
-      for (final r in filtered) {
-        final map = r as Map<String, dynamic>;
-        final pid = (map['program'] as Map<String, dynamic>)['id'] as int;
-        allProgress[pid] = map['progress'] as double;
-        allDays[pid] = map['days'] as List<dynamic>;
-        allCompleted[pid] = map['completed'] as bool;
+      for (final program in programs) {
+        final programId = program['id'] as int? ?? 0;
+        if (programId <= 0) continue;
+
+        allPrograms.add(program);
+        allProgress[programId] = (program['progress_percent'] as int? ?? 0).clamp(0, 100) / 100.0;
+        allDays[programId] = List<dynamic>.from(program['days'] ?? []);
+        allCompleted[programId] = program['is_completed'] as bool? ?? false;
       }
 
       if (mounted) {
