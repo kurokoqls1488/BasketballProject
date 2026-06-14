@@ -380,7 +380,7 @@ class AuthService {
     try {
       final response = await supabaseClient
           .from('complexes')
-          .select('id,name')
+          .select('id,name_complex,image')
           .order('id', ascending: true)
           .timeout(const Duration(seconds: 15));
       final data = response.toList();
@@ -417,7 +417,7 @@ class AuthService {
     debugPrint('=== fetchAllWorkoutsWithImages START ===');
     final workoutsResponse = await supabaseClient
         .from('workouts')
-        .select('id,id_complex,name')
+        .select('id,id_complex,name_workout')
         .order('id', ascending: true)
         .timeout(const Duration(seconds: 30));
     final workouts = workoutsResponse.toList();
