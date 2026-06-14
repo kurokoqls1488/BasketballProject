@@ -398,6 +398,10 @@ class _HomeContentState extends State<HomeContent> {
                                       25.0,
                                       200.0,
                                     );
+                                    final resolvedImage = _authService.getValidImagePath(
+                                      complex.image,
+                                      fallbackImagePath: '',
+                                    );
 
                                     return Stack(
                                       fit: StackFit.expand,
@@ -452,56 +456,58 @@ class _HomeContentState extends State<HomeContent> {
                                               child: Hero(
                                                 tag:
                                                     'complex-image-${complex.id}',
-                                                child:
-                                                    _authService
-                                                        .getImageUrl(
-                                                          complex.image ?? '',
-                                                        )
-                                                        .startsWith('images/')
+                                                child: resolvedImage != null &&
+                                                        resolvedImage.startsWith('images/')
                                                     ? Image.asset(
-                                                        complex.image ?? '',
+                                                        resolvedImage,
                                                         fit: BoxFit.cover,
-                                                      ) // Для локальных изображений
-                                                    : Image.network(
-                                                        // Для изображений из Supabase Storage
-                                                        _authService
-                                                            .getImageUrl(
-                                                              complex.image ??
-                                                                  '',
-                                                            ),
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              debugPrint(
-                                                                '--- ОШИБКА ЗАГРУЗКИ ИЗОБРАЖЕНИЯ:',
-                                                              );
-                                                              debugPrint(
-                                                                'URL: ${_authService.getImageUrl(complex.image ?? '')}',
-                                                              );
-                                                              debugPrint(
-                                                                'Ошибка: $error',
-                                                              );
+                                                      )
+                                                    : resolvedImage != null &&
+                                                            resolvedImage.startsWith('http')
+                                                        ? Image.network(
+                                                            resolvedImage,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder:
+                                                                (
+                                                                  context,
+                                                                  error,
+                                                                  stackTrace,
+                                                                ) {
+                                                                  debugPrint(
+                                                                    '--- ОШИБКА ЗАГРУЗКИ ИЗОБРАЖЕНИЯ:',
+                                                                  );
+                                                                  debugPrint(
+                                                                    'URL: $resolvedImage',
+                                                                  );
+                                                                  debugPrint(
+                                                                    'Ошибка: $error',
+                                                                  );
 
-                                                              return Container(
-                                                                color:
-                                                                    Colors.grey,
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                                child: const Icon(
-                                                                  Icons
-                                                                      .broken_image,
-                                                                  color: Colors
-                                                                      .white,
-                                                                  size: 40,
-                                                                ),
-                                                              );
-                                                            },
-                                                      ),
+                                                                  return Container(
+                                                                    color:
+                                                                        Colors.grey,
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .center,
+                                                                    child: const Icon(
+                                                                      Icons
+                                                                          .broken_image,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      size: 40,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                          )
+                                                        : Container(
+                                                            color: Colors.black,
+                                                            alignment: Alignment.center,
+                                                            child: Icon(
+                                                              Icons.sports_basketball,
+                                                              color: Colors.white54,
+                                                              size: 40,
+                                                            ),
+                                                          ),
                                               ),
                                             ),
                                           ),

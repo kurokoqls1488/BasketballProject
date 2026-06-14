@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/locale_service.dart';
@@ -144,6 +145,44 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
     }
   }
 
+  Widget _buildWorkoutImage(String? image) {
+    final resolvedImage = _authService.getValidImagePath(
+      image,
+      fallbackImagePath: widget.complex.image,
+    );
+
+    if (resolvedImage != null && resolvedImage.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: resolvedImage,
+        fit: BoxFit.fitHeight,
+        placeholder: (context, url) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+        errorWidget: (context, url, error) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+      );
+    }
+
+    if (resolvedImage != null && resolvedImage.isNotEmpty) {
+      return Image.asset(
+        resolvedImage,
+        fit: BoxFit.fitHeight,
+        errorBuilder: (c, e, s) => Image.asset(
+          'images/pustoe_photo.png',
+          fit: BoxFit.fitHeight,
+        ),
+      );
+    }
+
+    return Image.asset(
+      'images/pustoe_photo.png',
+      fit: BoxFit.fitHeight,
+    );
+  }
+
   Widget _buildWorkoutCard(Workout workout) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -231,39 +270,16 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
                     ),
                   ),
                 ),
-                 Expanded(
-                   flex: 0,
-                   child: ClipRRect(
-                     borderRadius: const BorderRadius.only(
-                       topLeft: Radius.circular(15),
-                       bottomLeft: Radius.circular(15),
+                   Expanded(
+                     flex: 0,
+                     child: ClipRRect(
+                       borderRadius: const BorderRadius.only(
+                         topLeft: Radius.circular(15),
+                         bottomLeft: Radius.circular(15),
+                       ),
+                       child: _buildWorkoutImage(workout.image),
                      ),
-                     child: workout.image != null && workout.image!.isNotEmpty
-                         ? (workout.image!.startsWith('http')
-                             ? Image.network(
-                                 workout.image!,
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               )
-                             : Image.asset(
-                                 workout.image!.startsWith('images/')
-                                     ? workout.image!
-                                     : 'images/${workout.image!}',
-                                 fit: BoxFit.fitHeight,
-                                 errorBuilder: (c, e, s) => Image.asset(
-                                   'images/pustoe_photo.png',
-                                   fit: BoxFit.fitHeight,
-                                 ),
-                               ))
-                         : Image.asset(
-                             'images/pustoe_photo.png',
-                             fit: BoxFit.fitHeight,
-                           ),
                    ),
-                 ),
               ],
             ),
           ),

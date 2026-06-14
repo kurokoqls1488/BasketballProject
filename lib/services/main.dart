@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,6 +26,8 @@ Future<void> main() async {
 
   await SettingsService.loadSettings();
   await LocaleService.loadLanguage();
+  final authService = AuthService();
+  unawaited(authService.prefetchPublicData());
 
   runApp(
     ChangeNotifierProvider.value(value: authProvider, child: const MyApp()),

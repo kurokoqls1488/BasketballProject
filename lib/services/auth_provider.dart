@@ -56,7 +56,7 @@ class AuthProvider extends ChangeNotifier {
 
   // Слушатель изменений состояния аутентификации Supabase
   void _initAuthListener() {
-    _authService.supabaseClient.auth.onAuthStateChange.listen((data) {
+    _authService.supabaseClient.auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       final session = data.session;
 
@@ -78,6 +78,7 @@ class AuthProvider extends ChangeNotifier {
         _currentUser = null;
         _isAuthenticated = false;
         _clearSession();
+        await AuthService.clearUserCaches();
         notifyListeners();
       }
     });
@@ -134,6 +135,7 @@ class AuthProvider extends ChangeNotifier {
     _currentUser = null;
     _isAuthenticated = false;
     _clearSession();
+    await AuthService.clearUserCaches();
     notifyListeners();
   }
 

@@ -203,6 +203,10 @@ class _TrainingPageState extends State<TrainingPage> {
     final programName = program['name_program'] ?? program['name'] ?? '';
     final description = program['description'] ?? '';
     final image = program['image'] ?? '';
+    final resolvedImage = _authService.getValidImagePath(
+      image,
+      fallbackImagePath: '',
+    );
     final progress = (_programProgressCache[programId] ?? 0.0).clamp(0.0, 1.0);
     final days = _programDaysCache[programId] ?? [];
     final daysCount = days.length;
@@ -333,7 +337,7 @@ class _TrainingPageState extends State<TrainingPage> {
                         ),
                       ),
                     ),
-                    if (image.isNotEmpty && image.startsWith('images/'))
+                    if (resolvedImage != null && resolvedImage.startsWith('images/'))
                       Expanded(
                         flex: 0,
                         child: ClipRRect(
@@ -342,14 +346,14 @@ class _TrainingPageState extends State<TrainingPage> {
                             bottomRight: Radius.circular(9),
                           ),
                           child: Image.asset(
-                            image,
+                            resolvedImage,
                             fit: BoxFit.cover,
                             width: 90,
                             height: 120,
                           ),
                         ),
                       ),
-                    if (image.isNotEmpty && !image.startsWith('images/'))
+                    if (resolvedImage != null && resolvedImage.startsWith('http'))
                       Expanded(
                         flex: 0,
                         child: ClipRRect(
@@ -358,7 +362,7 @@ class _TrainingPageState extends State<TrainingPage> {
                             bottomRight: Radius.circular(9),
                           ),
                           child: Image.network(
-                            _authService.getImageUrl(image),
+                            resolvedImage,
                             fit: BoxFit.cover,
                             width: 90,
                             height: 120,

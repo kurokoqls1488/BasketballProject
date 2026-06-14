@@ -48,6 +48,9 @@ class _ProgramDaysPageState extends State<ProgramDaysPage> {
 
       final days = await _authService.fetchProgramDaysWithWorkouts(widget.programId);
       final userProgramId = await _authService.getOrCreateUserProgram(widget.programId);
+      if (userProgramId != null) {
+        await _authService.initializeAllProgramDays(userProgramId, days);
+      }
 
       List<DayWithWorkout> dayList = [];
       for (final day in days) {

@@ -270,9 +270,10 @@ class _DayDetailPageState extends State<DayDetailPage> {
                                           final exerciseId = exercise?['id'] as int?;
                                           if (exerciseId != null) {
                                             final imageUrl = exercise?['image'] as String? ?? '';
-                                            final displayImage = imageUrl.startsWith('images/')
-                                                ? imageUrl
-                                                : _authService.getImageUrl(imageUrl);
+                                            final displayImage = _authService.getValidImagePath(
+                                              imageUrl,
+                                              fallbackImagePath: 'images/pustoe_photo.png',
+                                            ) ?? 'images/pustoe_photo.png';
                                             final rawName = (exercise?['name'] as String?)?.isNotEmpty == true
                                                 ? exercise!['name'] as String
                                                 : null;
