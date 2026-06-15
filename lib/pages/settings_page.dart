@@ -208,12 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   },
                 ),
-                _buildActionTile(
-                  title: _t('Оценить приложение'),
-                  icon: Icons.star_outline,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 30),
+                 const SizedBox(height: 30),
                 Text(
                   _t('О приложении'),
                   style: const TextStyle(
