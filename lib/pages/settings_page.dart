@@ -208,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   },
                 ),
-                 const SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Text(
                   _t('О приложении'),
                   style: const TextStyle(

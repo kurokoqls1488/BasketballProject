@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/locale_service.dart';
@@ -41,8 +40,33 @@ class _FavoritesPageState extends State<FavoritesPage> with SingleTickerProvider
       final workouts = await _authService.fetchFavoriteWorkouts();
       final exercises = await _authService.fetchFavoriteExercises();
       if (mounted) {
+        // Enrich workouts with first exercise image (like in workouts_page.dart)
+        final enrichedWorkouts = <Map<String, dynamic>>[];
+        for (final workout in workouts) {
+          final workoutMap = Map<String, dynamic>.from(workout);
+          // If workout doesn't have an image or it's empty, try to get it from first exercise
+          final workoutImage = workoutMap['image'];
+          final hasImage = workoutImage != null && workoutImage.toString().isNotEmpty;
+          if (!hasImage &&
+              workoutMap['id'] != null) {
+            // Fetch exercises for this workout to get the first image
+            try {
+              final workoutExercises = await _authService.fetchExercises(workoutMap['id'] as int);
+              if (workoutExercises.isNotEmpty) {
+                final firstExercise = workoutExercises.first;
+                final exerciseImage = firstExercise['image'] as String?;
+                if (exerciseImage != null && exerciseImage.isNotEmpty) {
+                  workoutMap['image'] = exerciseImage;
+                }
+              }
+            } catch (e) {
+              debugPrint('Error fetching exercises for workout ${workoutMap['id']}: $e');
+            }
+          }
+          enrichedWorkouts.add(workoutMap);
+        }
         setState(() {
-          _favoriteWorkouts = List<Map<String, dynamic>>.from(workouts);
+          _favoriteWorkouts = enrichedWorkouts;
           _favoriteExercises = List<Map<String, dynamic>>.from(exercises);
           _favoriteWorkoutIds = _favoriteWorkouts.map((w) => w['id'] as int).toSet();
           _isLoading = false;
@@ -59,46 +83,6 @@ class _FavoritesPageState extends State<FavoritesPage> with SingleTickerProvider
      }
      await _loadFavorites();
    }
-
-    Widget _buildWorkoutImage(String image) {
-      final resolvedImage = _authService.getValidImagePath(
-        image,
-        fallbackImagePath: 'images/basketball_ico.png',
-      );
-
-      if (resolvedImage != null && resolvedImage.startsWith('http')) {
-        return CachedNetworkImage(
-          imageUrl: resolvedImage,
-          fit: BoxFit.fitHeight,
-          placeholder: (context, url) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight),
-          errorWidget: (context, url, error) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight),
-        );
-      }
-      if (resolvedImage != null && resolvedImage.isNotEmpty) {
-        return Image.asset(resolvedImage, fit: BoxFit.fitHeight, errorBuilder: (c, e, s) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight));
-      }
-      return Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight);
-    }
-
-    Widget _buildExerciseImage(String image) {
-      final resolvedImage = _authService.getValidImagePath(
-        image,
-        fallbackImagePath: 'images/pustoe_photo.png',
-      );
-
-      if (resolvedImage != null && resolvedImage.startsWith('http')) {
-        return CachedNetworkImage(
-          imageUrl: resolvedImage,
-          fit: BoxFit.fitHeight,
-          placeholder: (context, url) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight),
-          errorWidget: (context, url, error) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight),
-        );
-      }
-      if (resolvedImage != null && resolvedImage.isNotEmpty) {
-        return Image.asset(resolvedImage, fit: BoxFit.fitHeight, errorBuilder: (c, e, s) => Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight));
-      }
-      return Image.asset('images/pustoe_photo.png', fit: BoxFit.fitHeight);
-    }
 
     Widget _buildWorkoutCard(Map<String, dynamic> workout) {
       final workoutId = workout['id'] as int;
@@ -167,7 +151,7 @@ Expanded(
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    '$duration мин',
+                                    "${duration} мин",
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 14,
@@ -199,7 +183,30 @@ Expanded(
                         topLeft: Radius.circular(15),
                         bottomLeft: Radius.circular(15),
                       ),
-                      child: _buildWorkoutImage(image),
+                      child: image.isNotEmpty
+                          ? (image.startsWith('http')
+                              ? Image.network(
+                                  image,
+                                  fit: BoxFit.fitHeight,
+                                  errorBuilder: (c, e, s) => Image.asset(
+                                    'images/pustoe_photo.png',
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                )
+                              : Image.asset(
+                                  image.startsWith('images/')
+                                      ? image
+                                      : 'images/$image',
+                                  fit: BoxFit.fitHeight,
+                                  errorBuilder: (c, e, s) => Image.asset(
+                                    'images/pustoe_photo.png',
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                ))
+                          : Image.asset(
+                              'images/pustoe_photo.png',
+                              fit: BoxFit.fitHeight,
+                            ),
                     ),
                   ),
                 ],
@@ -300,7 +307,30 @@ Expanded(
                          topLeft: Radius.circular(15),
                          bottomLeft: Radius.circular(15),
                        ),
-                       child: _buildExerciseImage(image),
+                       child: image.isNotEmpty
+                           ? (image.startsWith('http')
+                               ? Image.network(
+                                   image,
+                                   fit: BoxFit.fitHeight,
+                                   errorBuilder: (c, e, s) => Image.asset(
+                                     'images/pustoe_photo.png',
+                                     fit: BoxFit.fitHeight,
+                                   ),
+                                 )
+                               : Image.asset(
+                                   image.startsWith('images/')
+                                       ? image
+                                       : 'images/$image',
+                                   fit: BoxFit.fitHeight,
+                                   errorBuilder: (c, e, s) => Image.asset(
+                                     'images/pustoe_photo.png',
+                                     fit: BoxFit.fitHeight,
+                                   ),
+                                 ))
+                           : Image.asset(
+                               'images/pustoe_photo.png',
+                               fit: BoxFit.fitHeight,
+                             ),
                      ),
                    ),
                 ],

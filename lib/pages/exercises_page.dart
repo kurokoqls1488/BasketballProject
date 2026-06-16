@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/locale_service.dart';
@@ -71,7 +70,15 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
   Future<void> _loadFavoriteExercises() async {
     try {
-      final favoriteIds = await _authService.fetchFavoriteExerciseIds();
+      final response = await _authService.fetchFavoriteExercises();
+      final Set<int> favoriteIds = {};
+      for (final json in response) {
+        final exerciseId = json['id'] as int?;
+        if (exerciseId != null) {
+          favoriteIds.add(exerciseId);
+          AuthService.updateExerciseFavoriteCache(exerciseId, true);
+        }
+      }
       if (mounted) {
         setState(() {
           _favoriteExerciseIds = favoriteIds;
@@ -128,44 +135,6 @@ class _ExercisesPageState extends State<ExercisesPage> {
         });
       }
     }
-  }
-
-  Widget _buildExerciseImage(String image) {
-    final resolvedImage = _authService.getValidImagePath(
-      image,
-      fallbackImagePath: 'images/pustoe_photo.png',
-    );
-
-    if (resolvedImage != null && resolvedImage.startsWith('http')) {
-      return CachedNetworkImage(
-        imageUrl: resolvedImage,
-        fit: BoxFit.fitHeight,
-        placeholder: (context, url) => Image.asset(
-          'images/pustoe_photo.png',
-          fit: BoxFit.fitHeight,
-        ),
-        errorWidget: (context, url, error) => Image.asset(
-          'images/pustoe_photo.png',
-          fit: BoxFit.fitHeight,
-        ),
-      );
-    }
-
-    if (resolvedImage != null && resolvedImage.isNotEmpty) {
-      return Image.asset(
-        resolvedImage,
-        fit: BoxFit.fitHeight,
-        errorBuilder: (c, e, s) => Image.asset(
-          'images/pustoe_photo.png',
-          fit: BoxFit.fitHeight,
-        ),
-      );
-    }
-
-    return Image.asset(
-      'images/pustoe_photo.png',
-      fit: BoxFit.fitHeight,
-    );
   }
 
   @override
@@ -312,16 +281,40 @@ class _ExercisesPageState extends State<ExercisesPage> {
                            onPressed: () => _toggleFavoriteExercise(ex),
                          ),
                        ),
-                       Expanded(
-                         flex: 0,
-                         child: ClipRRect(
-                           borderRadius: const BorderRadius.only(
-                             topLeft: Radius.circular(15),
-                             bottomLeft: Radius.circular(15),
-                           ),
-                           child: _buildExerciseImage(ex.image),
-                         ),
-                       ),
+                      // Фото (справа, фиксированная ширина, закругления слева because it's on the right edge)
+                      Expanded(
+                        flex: 0,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
+                          ),
+                          child: ex.image.isNotEmpty
+                              ? ex.image.startsWith('http')
+                                  ? Image.network(
+                                      ex.image,
+                                      fit: BoxFit.fitHeight,
+                                      errorBuilder: (c, e, s) => Image.asset(
+                                        'images/pustoe_photo.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      ex.image.startsWith('images/')
+                                          ? ex.image
+                                          : 'images/${ex.image}',
+                                      fit: BoxFit.fitHeight,
+                                      errorBuilder: (c, e, s) => Image.asset(
+                                        'images/pustoe_photo.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    )
+                              : Image.asset(
+                                  'images/pustoe_photo.png',
+                                  fit: BoxFit.fitHeight,
+                                ),
+                        ),
+                      ),
                   ],
                 ),
               ),

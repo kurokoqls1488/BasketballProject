@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import '../services/auth_service.dart';
 import '../services/locale_service.dart';
 import '../services/settings_service.dart';
 
@@ -29,7 +27,6 @@ class ExerciseDetailPage extends StatefulWidget {
 }
 
 class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
-  final AuthService _authService = AuthService();
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   Timer? _timer;
@@ -55,24 +52,29 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
   }
 
   Future<void> _initializeVideo() async {
-    final videoPath = _authService.resolveVideoPath(widget.video);
-    if (videoPath == null) {
+    if (widget.video == null || widget.video!.isEmpty) {
       return;
     }
 
     try {
-      _videoController = videoPath.startsWith('http')
-          ? VideoPlayerController.networkUrl(Uri.parse(videoPath))
-          : VideoPlayerController.asset(videoPath);
-      await _videoController!.initialize();
-      _videoController!.setLooping(true);
-      _videoController!.setPlaybackSpeed(1.0);
-      await _videoController!.play();
-      if (mounted) {
-        setState(() {
-          _isVideoInitialized = true;
-        });
+      String videoPath;
+      if (widget.video!.startsWith('videos/')) {
+        videoPath = widget.video!;
+      } else {
+        videoPath = 'videos/${widget.video}';
       }
+
+      _videoController = VideoPlayerController.asset(videoPath)
+        ..initialize().then((_) {
+          _videoController!.setLooping(true);
+          _videoController!.setPlaybackSpeed(0.5);
+          _videoController!.play();
+          if (mounted) {
+            setState(() {
+              _isVideoInitialized = true;
+            });
+          }
+        });
     } catch (e, stack) {
       debugPrint('Error loading video: $e\n$stack');
     }
@@ -488,28 +490,22 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
       );
     }
 
-    final resolvedImage = _authService.getValidImagePath(
-      widget.image,
-      fallbackImagePath: 'images/pustoe_photo.png',
-    );
-
-    if (resolvedImage != null && resolvedImage.startsWith('http')) {
-      return CachedNetworkImage(
-        imageUrl: resolvedImage,
+    if (widget.image.startsWith('http')) {
+      return Image.network(
+        widget.image,
         fit: BoxFit.cover,
-        placeholder: (context, url) => Image.asset(
-          'images/pustoe_photo.png',
-          fit: BoxFit.cover,
-        ),
-        errorWidget: (context, error, stackTrace) => Image.asset(
+        errorBuilder: (context, error, stackTrace) => Image.asset(
           'images/pustoe_photo.png',
           fit: BoxFit.cover,
         ),
       );
     }
-    if (resolvedImage != null && resolvedImage.isNotEmpty) {
+    if (widget.image.isNotEmpty) {
+      final assetPath = widget.image.startsWith('images/')
+          ? widget.image
+          : 'images/${widget.image}';
       return Image.asset(
-        resolvedImage,
+        assetPath,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => Image.asset(
           'images/pustoe_photo.png',
@@ -538,7 +534,7 @@ class _VideoPlayerControlsState extends State<_VideoPlayerControls> {
   @override
   void initState() {
     super.initState();
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) setState(() {});
     });
   }
